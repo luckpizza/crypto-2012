@@ -10,12 +10,12 @@
 #include "bitmap.h"
 
 
-int
-main(void)
-{
-	printf("am I working??");
-	simple_8bits_BMP_t * img;
-	img = load_bmp_from_file("./misc/300/Eva.bmp");
-	save_bmp_to_file(img, "./misc/out.bmp");
-	printf("img is %p", img);
-}
+//int
+//main(void)
+//{
+//	printf("am I working??");
+//	simple_8bits_BMP_t * img;
+//	img = load_bmp_from_file("./misc/bmps300x450/Albert.bmp");
+//	save_bmp_to_file(img, "./misc/out.bmp");
+//	printf("img is %p", img);
+//}
