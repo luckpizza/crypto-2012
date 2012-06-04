@@ -7,25 +7,30 @@
 
 #include "debug.h"
 #include "status_definitions.h"
+#include <openssl/md5.h>
+/*
+ * It already have th parity bit
+ */
+
 int
 get_k_coefficients(const unsigned char *src , int k, unsigned char *dst )
 {
 	int rta = OK;
 	switch (k) {
 		case 2:
-			dst[0] = src[0] >>4;
+			dst[0] = src[0] >>5;
 			dst[1] = src[1] >>4;
 			debug("getting Coefficients for k = 2 d1 = %d", dst[1]);
 			break;
 		case 3:
 			dst[0] = src[0] >>3;
 			dst[1] = src[1] >>3;
-			dst[2] = src[2] >>2;
+			dst[2] = src[2] >>3;
 			debug("getting Coefficients for k = 3 d1 = %d ,  d2 = %d , d3= %d \n", dst[0], dst[1], dst[2]);
 
 			break;
 		case 4:
-			dst[0] = src[0] >>2;
+			dst[0] = src[0] >>3;
 			dst[1] = src[1] >>2;
 			dst[2] = src[2] >>2;
 			dst[3] = src[3] >>2;
@@ -39,27 +44,29 @@ get_k_coefficients(const unsigned char *src , int k, unsigned char *dst )
 	return rta;
 
 }
-
+/*
+ * it already have the parity bit
+ */
 int
 save_b_to_coefficients(const unsigned char b , int k, unsigned char *dst )
 {
 	int rta = OK;
 		switch (k) {
 			case 2:
-				dst[0] = (dst[0] & 0xF0) | (b & 0x0F);
+				dst[0] = (dst[0] & 0xE0) | (b & 0x0F);
 				dst[1] = (dst[1] & 0xF0) |  (b >>4);
 				debug("getting Coefficients for k = 2 d1 = %d", dst[1]);
 				break;
 			case 3:
-				dst[0] = (dst[0] & 0xF8) | (b & 0x07);
-				dst[1] = (dst[1] & 0xF8) | (b>>3 & 0x07);
-				dst[2] = (dst[2] & 0xFC) | (b>>6 );
+				dst[0] = (dst[0] & 0xF8) | (b & 0x03);
+				dst[1] = (dst[1] & 0xF8) | (b>>2 & 0x07);
+				dst[2] = (dst[2] & 0xF8) | (b>>5 );
 				debug("dst[2] = %d , (dst[2] & 0xFC) = %d , (b>>6 ) = %d",dst[2],  (dst[2] & 0xFC),(b>>6 ) );
 				debug("saving b to Coefficients for k = 3 d1 = %d ,  d2 = %d , d3= %d \n", dst[0], dst[1], dst[2]);
 
 				break;
 			case 4:
-				dst[0] = (dst[0] & 0xFC) | (b & 0x03);
+				dst[0] = (dst[0] & 0xF8) | (b & 0x03);
 				dst[1] = (dst[1] & 0xFC) | (b>>2 & 0x03);
 				dst[2] = (dst[2] & 0xFC) | (b>>4 & 0x03);
 				dst[3] = (dst[3] & 0xFC) | (b>>6 & 0x03);
@@ -73,6 +80,37 @@ save_b_to_coefficients(const unsigned char b , int k, unsigned char *dst )
 		return rta;
 }
 
+unsigned char
+xor_between_bits(const unsigned char * bits, int amount_of_bytes)
+{
+	int i = 0;
+	int j = 0;
+	unsigned char rta = 0x00;
+	while( i < amount_of_bytes)
+	{
+		for( j = 0 ; j < 8; ++j){
+			rta = (bits[i]>>j & 0x01)^rta;
+
+		}
+		++i;
+	}
+	debug("final answer of xor_bits is %d", rta);
+	return rta;
+
+}
+
+unsigned char
+get_md5_parity_bit(const unsigned char * src, int lenght)
+{
+	unsigned char md5_digest[MD5_DIGEST_LENGTH];
+	MD5(src, lenght, md5_digest);
+	return xor_between_bits(md5_digest, MD5_DIGEST_LENGTH);
+  //  SHA256((unsigned char*) passwordAndSalt, strlen(passwordAndSalt), SHA256Password);
+
+}
+
+
+
 int
 main(void)
 {
@@ -81,6 +119,9 @@ main(void)
 //	get_k_coefficients(src, 3, dst);
 	unsigned char b = 0xFF;
 	save_b_to_coefficients(b, 3, dst);
+//	unsigned char b_bits = xor_between_bits(src, 3);
+	unsigned char b_bits = get_md5_parity_bit(src, 3);
+
 }
 
 //int

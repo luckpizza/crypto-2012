@@ -27,6 +27,9 @@
 								</outputEntries>
 							</builder>
 							<tool id="cdt.managedbuild.tool.macosx.c.linker.macosx.exe.debug.1208952174" name="MacOS X C Linker" superClass="cdt.managedbuild.tool.macosx.c.linker.macosx.exe.debug">
+								<option id="macosx.c.link.option.libs.1171680802" name="Libraries (-l)" superClass="macosx.c.link.option.libs" valueType="libs">
+									<listOptionValue builtIn="false" value="crypto"/>
+								</option>
 								<inputType id="cdt.managedbuild.tool.macosx.c.linker.input.770099250" superClass="cdt.managedbuild.tool.macosx.c.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
 									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
