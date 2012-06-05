@@ -110,21 +110,25 @@ get_md5_parity_bit(const unsigned char * src, int lenght)
 
 
 
-int
-main(void)
-{
-	unsigned char src[3] = {0xFF, 0xFF, 0xFF};
-	unsigned char dst[3] = {0x00 , 0x00, 0x00};
-//	get_k_coefficients(src, 3, dst);
-	unsigned char b = 0xFF;
-	save_b_to_coefficients(b, 3, dst);
-//	unsigned char b_bits = xor_between_bits(src, 3);
-	unsigned char b_bits = get_md5_parity_bit(src, 3);
-	debug("FF div FF = %d \n", divide(0xFF, 0xFF));
-	debug("CF div CF = %d \n", divide(0xCF, 0xCF));
-	debug("FF div 11 = %d \n", divide(0xFF, 0x11));
+//int
+//main(void)
+//{
+//	unsigned char src[3] = {0xFF, 0xFF, 0xFF};
+//	unsigned char dst[3] = {0x00 , 0x00, 0x00};
+////	get_k_coefficients(src, 3, dst);
+//	unsigned char b = 0xFF;
+//	save_b_to_coefficients(b, 3, dst);
+////	unsigned char b_bits = xor_between_bits(src, 3);
+//	unsigned char b_bits = get_md5_parity_bit(src, 3);
+//	debug("FF div FF = %d \n", divide(0xFF, 0xFF));
+//	debug("CF div CF = %d \n", divide(0xCF, 0xCF));
+//	debug("FF div 11 = %d \n", divide(0xFF, 0x11));
+//
+//}
 
-}
+
+
+
 
 //int
 //save_k_coefficients(const unsigned int *src , int k, unsigned char *dst )
