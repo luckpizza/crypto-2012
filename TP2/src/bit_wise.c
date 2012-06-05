@@ -11,7 +11,6 @@
 /*
  * It already have th parity bit
  */
-
 int
 get_k_coefficients(const unsigned char *src , int k, unsigned char *dst )
 {
@@ -121,6 +120,9 @@ main(void)
 	save_b_to_coefficients(b, 3, dst);
 //	unsigned char b_bits = xor_between_bits(src, 3);
 	unsigned char b_bits = get_md5_parity_bit(src, 3);
+	debug("FF div FF = %d \n", divide(0xFF, 0xFF));
+	debug("CF div CF = %d \n", divide(0xCF, 0xCF));
+	debug("FF div 11 = %d \n", divide(0xFF, 0x11));
 
 }
 
