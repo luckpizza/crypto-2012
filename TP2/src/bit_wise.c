@@ -73,27 +73,27 @@ get_k_coefficients_no_cero(const unsigned char *src , int k, unsigned char *dst 
  */
 int
 save_b_to_coefficients(const unsigned char b , int k, unsigned char *dst )
-{
+{// unsigned char b = 0xFF;
 	int rta = OK;
 		switch (k) {
 			case 2:
-				dst[0] = (5<<dst[0] & 0xE0) | (b & 0x0F);
-				dst[1] = (4<<dst[1] & 0xF0) |  (b >>4);
+				dst[0] = (dst[0]<<5 & 0xE0) | (b & 0x0F);
+				dst[1] = (dst[1]<<4 & 0xF0) |  (b >>4);
 				debug("getting Coefficients for k = 2 d1 = %d", dst[1]);
 				break;
 			case 3:
-				dst[0] = (3<<dst[0] & 0xF8) | (b & 0x03);
-				dst[1] = (3<<dst[1] & 0xF8) | (b>>2 & 0x07);
-				dst[2] = (3<<dst[2] & 0xF8) | (b>>5 );
+				dst[0] = (dst[0]<<3 & 0xF8) | (b & 0x03);
+				dst[1] = (dst[1]<<3 & 0xF8) | (b>>2 & 0x07);
+				dst[2] = (dst[2]<<3 & 0xF8) | (b>>5 );
 				debug("dst[2] = %d , (dst[2] & 0xFC) = %d , (b>>6 ) = %d",dst[2],  (dst[2] & 0xFC),(b>>6 ) );
 				debug("saving b to Coefficients for k = 3 d1 = %d ,  d2 = %d , d3= %d \n", dst[0], dst[1], dst[2]);
 
 				break;
 			case 4:
-				dst[0] = (3<<dst[0] & 0xF8) | (b & 0x03);
-				dst[1] = (2<<dst[1] & 0xFC) | (b>>2 & 0x03);
-				dst[2] = (2<<dst[2] & 0xFC) | (b>>4 & 0x03);
-				dst[3] = (2<<dst[3] & 0xFC) | (b>>6 & 0x03);
+				dst[0] = (dst[0]<<3 & 0xF8) | (b & 0x03);
+				dst[1] = (dst[1]<<2 & 0xFC) | (b>>2 & 0x03);
+				dst[2] = (dst[2]<<2 & 0xFC) | (b>>4 & 0x03);
+				dst[3] = (dst[3]<<2 & 0xFC) | (b>>6 & 0x03);
 				debug("getting Coefficients for k = 4 d1 = %d", dst[1]);
 
 				break;

@@ -134,13 +134,13 @@ share_secret(int k, int n, simple_8bits_BMP_t * secret, simple_8bits_BMP_t ** sh
 	int j = 0;
 	int status = 0;
 	img_with_state_t *sec;
-	unsigned char ** bytes = my_malloc(n);
+	unsigned char ** bytes = my_malloc(n * sizeof(char*));
 	unsigned char b = 0x00;
 	if(k > n)
 	{
 		return ERROR;
 	}
-	img_with_state_t ** shads = my_malloc(sizeof(img_with_state_t) * n);
+	img_with_state_t ** shads = my_malloc(sizeof(img_with_state_t*) * n);
 	sec = new_one_step_in_img(secret, k);
 	for(i =0 ; i < n ; ++i)
 	{
@@ -148,6 +148,7 @@ share_secret(int k, int n, simple_8bits_BMP_t * secret, simple_8bits_BMP_t ** sh
 	}
 	for(i = 0 ; i < (secret->dib_header->height * secret->dib_header->width / k) + 1 ; ++i)
 	{
+		status = one_step_in_img(sec);
 		status = one_step_in_imgs(shads, n);
 		for(j = 0; j < n ; ++j)
 		{

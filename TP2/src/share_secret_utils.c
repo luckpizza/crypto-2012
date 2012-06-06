@@ -78,10 +78,12 @@ are_linear_independent(unsigned char * v1, unsigned char * v2, int amount)
 		exit(-1);
 	}
 	unsigned char tmp = 0;
-	int i = 1;
+	int i = 0;
 	tmp = divide(v1[0], v2[0]);
 	while(i < amount)
 	{
+		if((v1[i] | v2[i]) != 0 &&( v1[i] == 0 || v2[i] == 0))
+			return YES;
 		if(divide(v1[i], v2[i]) != tmp)
 		{
 			return YES;
@@ -91,23 +93,23 @@ are_linear_independent(unsigned char * v1, unsigned char * v2, int amount)
 	return NO;
 }
 
-int
-main(void)
-{
-	unsigned char coeff[3] = {7,12,27};
-	unsigned char coeff1[3] = {14,24,54};
-	unsigned char *cof[2];
-	unsigned char sec[3] = {110, 24, 72};
-	cof[0] = coeff;
-	cof[1] = coeff1;
-	int rta = calculate_b(coeff, sec, 3);
-	printf("b is %d \n", rta);
-	rta = make_linear_independent(cof, 3, 2);
-	printf("they where NOT lineal_indep!! but now are they? %d \n c11 = %d, c12 %d, c13 = %d, c21 =%d, c22 = %d, c23 %d", rta, coeff[0], coeff[1], coeff[2], coeff1[0], coeff1[1], coeff1[2]);
-	rta = are_linear_independent(coeff, sec, 3);
-	printf("they are lineal_indep!! are they? %d \n", rta);
-	return 1;
-}
+//int
+//main(void)
+//{
+//	unsigned char coeff[3] = {7,12,27};
+//	unsigned char coeff1[3] = {14,24,54};
+//	unsigned char *cof[2];
+//	unsigned char sec[3] = {110, 24, 72};
+//	cof[0] = coeff;
+//	cof[1] = coeff1;
+//	int rta = calculate_b(coeff, sec, 3);
+//	printf("b is %d \n", rta);
+//	rta = make_linear_independent(cof, 3, 2);
+//	printf("they where NOT lineal_indep!! but now are they? %d \n c11 = %d, c12 %d, c13 = %d, c21 =%d, c22 = %d, c23 %d", rta, coeff[0], coeff[1], coeff[2], coeff1[0], coeff1[1], coeff1[2]);
+//	rta = are_linear_independent(coeff, sec, 3);
+//	printf("they are lineal_indep!! are they? %d \n", rta);
+//	return 1;
+//}
 
 
 
