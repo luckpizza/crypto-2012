@@ -50,19 +50,19 @@ are_linear_independent(unsigned char * v1, unsigned char * v2, int amount)
 	return 1;
 }
 
-int
-main(void)
-{
-	unsigned char coeff[3] = {7,12,27};
-	unsigned char coeff1[3] = {14,24,29};
-
-	unsigned char sec[3] = {110, 24, 72};
-
-	int rta = calculate_b(coeff, sec, 3);
-	printf("b is %d \n", rta);
-	rta = are_linear_independent(coeff, coeff1, 3);
-	printf("they are NOT lineal_indep!! are they? %d \n", rta);
-	rta = are_linear_independent(coeff, sec, 3);
-	printf("they are lineal_indep!! are they? %d \n", rta);
-	return 1;
-}
+//int
+//main(void)
+//{
+//	unsigned char coeff[3] = {7,12,27};
+//	unsigned char coeff1[3] = {14,24,29};
+//
+//	unsigned char sec[3] = {110, 24, 72};
+//
+//	int rta = calculate_b(coeff, sec, 3);
+//	printf("b is %d \n", rta);
+//	rta = are_linear_independent(coeff, coeff1, 3);
+//	printf("they are NOT lineal_indep!! are they? %d \n", rta);
+//	rta = are_linear_independent(coeff, sec, 3);
+//	printf("they are lineal_indep!! are they? %d \n", rta);
+//	return 1;
+//}
