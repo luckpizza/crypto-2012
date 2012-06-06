@@ -21,3 +21,6 @@ calculate_b(unsigned char * coefficients,unsigned char * secret_bytes, int amoun
 int
 are_linear_independent(unsigned char * v1, unsigned char * v2, int amount);
 #endif /* SHARE_SECRET_UTILS_H_ */
+
+int
+make_linear_independent(unsigned char ** data, int k , int n);

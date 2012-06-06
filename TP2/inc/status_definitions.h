@@ -14,6 +14,7 @@
 #define NO 0
 #define TRUE 1
 #define FALSE 0
+#define MODIFIED 0
 
 
 #endif /* STATUS_DEFINITIONS_H_ */

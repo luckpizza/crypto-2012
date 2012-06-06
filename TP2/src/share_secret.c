@@ -113,6 +113,8 @@ one_step_in_img(img_with_state_t * img)
 	return OK;
 }
 
+
+
 int
 share_secret(int k, int n, simple_8bits_BMP_t * secret, simple_8bits_BMP_t ** shadows)
 {

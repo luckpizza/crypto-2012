@@ -8,6 +8,7 @@
 #include "mod251_operations.h"
 #include "debug.h"
 #include "status_definitions.h"
+#include "share_secret_utils.h"
 /**
  * given a group fo coefficients and secret bytes, it calculates the "b" to
  * be stored as a secret!
@@ -28,10 +29,42 @@ calculate_b(unsigned char * coefficients,unsigned char * secret_bytes, int amoun
 	return rta;
 }
 
+//TODO: perfectionate this function in order to prevent looping over 251
+void modify_one_byte(unsigned char *data, int k)
+{
+	int i = (((double)rand()) /RAND_MAX) * (k-1);
+	data[i] = (data[i] + i) %251;
+}
+
 int
 make_linear_independent(unsigned char ** data, int k , int n)
 {
+	int i = 0;
+	int j = 0;
+	int status = MODIFIED;
+	while(status != OK)
+	{
+		status = OK;
+		i = 0;
+		j = 0;
+		while(status == OK && i < n)
+		{
+			j = i + 1;
+			while(status == OK && j < n)
+			{
+				if(!are_linear_independent(data[i], data[j], k))
+				{
+					modify_one_byte(data[i], k);
+					status = MODIFIED;
 
+				}
+				++j;
+			}
+			++i;
+		}
+
+	}
+	return OK;
 }
 
 /**
