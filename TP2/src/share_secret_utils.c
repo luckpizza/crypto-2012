@@ -14,15 +14,15 @@
  * be stored as a secret!
  */
 unsigned char
-calculate_b(unsigned char * coefficients,unsigned char * secret_bytes, int amount)
+calculate_b(unsigned char * coefficients,unsigned char * secret_bytes, int k)
 {
-	if(amount < 1){
+	if(k < 1){
 		error("error calculation b, amount to small \n");
 		exit(-1);
 	}
 	int i = 0;
 	unsigned char rta = 0;
-	for(i = 0; i < amount; ++i)
+	for(i = 0; i < k; ++i)
 	{
 		rta = sum(rta,mul( coefficients[i], secret_bytes[i]));
 	}
@@ -90,6 +90,26 @@ are_linear_independent(unsigned char * v1, unsigned char * v2, int amount)
 	}
 	return NO;
 }
+
+int
+main(void)
+{
+	unsigned char coeff[3] = {7,12,27};
+	unsigned char coeff1[3] = {14,24,54};
+	unsigned char *cof[2];
+	unsigned char sec[3] = {110, 24, 72};
+	cof[0] = coeff;
+	cof[1] = coeff1;
+	int rta = calculate_b(coeff, sec, 3);
+	printf("b is %d \n", rta);
+	rta = make_linear_independent(cof, 3, 2);
+	printf("they where NOT lineal_indep!! but now are they? %d \n c11 = %d, c12 %d, c13 = %d, c21 =%d, c22 = %d, c23 %d", rta, coeff[0], coeff[1], coeff[2], coeff1[0], coeff1[1], coeff1[2]);
+	rta = are_linear_independent(coeff, sec, 3);
+	printf("they are lineal_indep!! are they? %d \n", rta);
+	return 1;
+}
+
+
 
 //int
 //main(void)

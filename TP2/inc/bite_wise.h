@@ -27,4 +27,12 @@ unsigned char
 get_md5_parity_bit(const unsigned char * src, int lenght);
 
 
+/**
+ * This function is the same as get_k_coefficients but
+ * it  don't let all coefficients to be 0!
+ *
+ */
+int
+get_k_coefficients_no_cero(const unsigned char *src , int k, unsigned char *dst );
+
 #endif /* BITE_WISE_H_ */

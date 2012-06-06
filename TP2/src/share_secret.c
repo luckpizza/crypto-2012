@@ -11,6 +11,8 @@
 #include "memory_utils.h"
 #include "debug.h"
 #include "bitmap.h"
+#include "share_secret_utils.h"
+#include "bite_wise.h"
 
 
 typedef struct img_with_state{
@@ -113,17 +115,54 @@ one_step_in_img(img_with_state_t * img)
 	return OK;
 }
 
-
+int
+one_step_in_imgs(img_with_state_t ** img, int n)
+{
+	int i = 0;
+	int status = 0;
+	for(i = 0 ; i < n ; ++i)
+	{
+		status =one_step_in_img(img[i]);
+	}
+	return status;
+}
 
 int
 share_secret(int k, int n, simple_8bits_BMP_t * secret, simple_8bits_BMP_t ** shadows)
 {
+	int i =0;
+	int j = 0;
+	int status = 0;
+	img_with_state_t *sec;
+	unsigned char ** bytes = my_malloc(n);
+	unsigned char b = 0x00;
 	if(k > n)
 	{
 		return ERROR;
 	}
-
-
+	img_with_state_t ** shads = my_malloc(sizeof(img_with_state_t) * n);
+	sec = new_one_step_in_img(secret, k);
+	for(i =0 ; i < n ; ++i)
+	{
+		shads[i] = new_one_step_in_img(shadows[i], k);
+	}
+	for(i = 0 ; i < (secret->dib_header->height * secret->dib_header->width / k) + 1 ; ++i)
+	{
+		status = one_step_in_imgs(shads, n);
+		for(j = 0; j < n ; ++j)
+		{
+			bytes[j] = shads[j]->current_bytes;
+			get_k_coefficients_no_cero(bytes[j], k, bytes[j]);
+		}
+		make_linear_independent(bytes, k, n);
+		for(j = 0; j< n ; ++j)
+		{
+			b = calculate_b(bytes[j], sec->current_bytes, k);
+			save_b_to_coefficients(b, k,bytes[j]);
+		}
+	//	cal
+	}
+	my_free(bytes);
 	return OK;
 }
 
