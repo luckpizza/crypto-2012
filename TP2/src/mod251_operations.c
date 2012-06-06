@@ -28,6 +28,8 @@ mul(unsigned char a, unsigned char b)
 unsigned char
 calculate_inverse(unsigned char b)
 {
+	if(b == 0 || b == 251)
+		return 0;
 	unsigned char i = 1;
 	int rta = 0;
 	while((rta = (b*i) %251) != 1)

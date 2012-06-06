@@ -9,6 +9,7 @@
 #define STATUS_DEFINITIONS_H_
 #define OK 1
 #define ERROR -1
+#define DONE 2
 
 
 #endif /* STATUS_DEFINITIONS_H_ */

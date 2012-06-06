@@ -18,7 +18,7 @@ save_b_to_coefficients(const unsigned char b , int k, unsigned char *dst );
  */
 
 int
-get_k_coefficients(const unsigned char *src , int k, unsigned char *dst );
+save_b_to_original_pixel(const unsigned char *src , int k, unsigned char *dst );
 
 //unsigned char
 //xor_between_bits(const unsigned char * bits, int amount_of_bytes);
