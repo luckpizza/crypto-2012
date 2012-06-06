@@ -7,6 +7,7 @@
 
 #include "mod251_operations.h"
 #include "debug.h"
+#include "status_definitions.h"
 /**
  * given a group fo coefficients and secret bytes, it calculates the "b" to
  * be stored as a secret!
@@ -26,6 +27,13 @@ calculate_b(unsigned char * coefficients,unsigned char * secret_bytes, int amoun
 	}
 	return rta;
 }
+
+int
+make_linear_independent(unsigned char ** data, int k , int n)
+{
+
+}
+
 /**
  * return 1 if independent, 0 if not
  */
@@ -41,20 +49,20 @@ are_linear_independent(unsigned char * v1, unsigned char * v2, int amount)
 	tmp = divide(v1[0], v2[0]);
 	while(i < amount)
 	{
-		if(divide(v1[i], v2[1]) == tmp)
+		if(divide(v1[i], v2[i]) != tmp)
 		{
-			return 0;
+			return YES;
 		}
 		++i;
 	}
-	return 1;
+	return NO;
 }
 
 //int
 //main(void)
 //{
 //	unsigned char coeff[3] = {7,12,27};
-//	unsigned char coeff1[3] = {14,24,29};
+//	unsigned char coeff1[3] = {14,24,54};
 //
 //	unsigned char sec[3] = {110, 24, 72};
 //

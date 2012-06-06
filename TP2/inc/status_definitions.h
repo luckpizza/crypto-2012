@@ -10,6 +10,10 @@
 #define OK 1
 #define ERROR -1
 #define DONE 2
+#define YES 1
+#define NO 0
+#define TRUE 1
+#define FALSE 0
 
 
 #endif /* STATUS_DEFINITIONS_H_ */
