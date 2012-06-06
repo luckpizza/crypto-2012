@@ -79,6 +79,7 @@ one_step_in_img(img_with_state_t * img)
 				error(" one_step_in_img error  ... trying to modify more height than permited");
 				return ERROR;
 			}
+			++idx;
 		}
 	}
 	if(img->current_bytes == NULL)
@@ -107,6 +108,7 @@ one_step_in_img(img_with_state_t * img)
 			img->i = -1; //Invalidate the image so it can't enter to this function any more!
 			return DONE;
 		}
+		++idx;
 	}
 	return OK;
 }

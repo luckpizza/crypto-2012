@@ -71,6 +71,7 @@ load_bmp_from_file( char * file_path)
 		}
 	}
 	img->dib_header = dib_header;
+	fclose(file);
 	return img;
 
 }
