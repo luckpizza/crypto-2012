@@ -22,6 +22,12 @@ typedef struct img_with_state{
 	int j;
 	int k;
 }img_with_state_t;
+
+typedef struct row{
+	unsigned char * bytes;
+	unsigned char b;
+	int index;
+}row_t;
 /**
  * creates a new img_with_state from a iamgine and the k magic number
  */
@@ -125,6 +131,167 @@ one_step_in_imgs(img_with_state_t ** img, int n)
 		status =one_step_in_img(img[i]);
 	}
 	return status;
+}
+
+void
+swap_rows( row_t * a, row_t * b)
+{
+	row_t * tmp = a;
+	a = b;
+	b = tmp;
+}
+void
+swap_bytes(unsigned char ** a, unsigned char ** b)
+{
+	char ** tmp;
+	tmp = a;
+	a = b;
+	b = tmp;
+}
+
+void
+swap_char( unsigned char *a, unsigned char *b)
+{
+	char * tmp;
+	tmp = a;
+	a = b;
+	b = tmp;
+}
+
+void
+x_mul_bytes(unsigned char x, unsigned char * bytes, int k)
+{
+	for (int i = 0; i < k; ++i) {
+		bytes[i] = mul(bytes[i], x);
+	}
+}
+
+void
+x_mul_row(unsigned char x, row_t * row, int k)
+{
+	x_mul_bytes(x, row->bytes, k );
+	row->b = mul(row->b, x);
+
+}
+
+void
+row_sub_row(row_t * a, row_t * b, int k)
+{
+	for (int i = 0; i < k; ++i) {
+		a->bytes[i] = sub(a->bytes[i], b->bytes[i]);
+	}
+	a->b = sub(a->b , b->b);
+
+}
+
+int
+calculate_secret_bytes(unsigned char **bytes,unsigned char * bs, unsigned char * recover_bytes,int k )
+{
+	int i, j;
+	unsigned char check1 = 0;
+	unsigned char check2 = 0;
+	row_t * rows = my_malloc(k*sizeof(row_t));
+	row_t row_pivot;
+	row_pivot.bytes = my_malloc((k * sizeof(char)));
+	//Check if we have a row or colum with only ones! if so --> error
+	for(i = 0 ; i < k; ++i)
+	{
+		check1 = 0;
+		check2 = 0;
+		for (j = 0; j < k; ++j)
+		{
+			check1 = check1 | bytes[j][i];
+			check2 = check2 | bytes[i][j];
+		}
+		if(check1 == 0 || check2 ==0)
+		{
+			error("calculate_secret_bytes : there was a column or row with all ceros");
+			return ERROR;
+		}
+		rows[i].b = bs[i];
+		rows[i].bytes = bytes[i];
+		rows[i].index = i;
+	}
+	////
+
+	//Start gauss
+	for(i = 0 ; i < k ; ++i)
+	{
+		for(j = i ; j < k ; ++j)
+		{
+			if(rows[i].bytes[j] != 0)
+			{
+				swap_rows(rows[i], rows[j]);
+				break;
+			}
+		}
+		error("calculate_secret_bytes : The equations where linear or an error has ocurre!");
+		unsigned char x = 0;
+		for(j = (i + 1) ; j < k ; ++j)
+		{
+			if(rows[j].bytes[i] == 0)
+				continue;
+			memcpy(row_pivot.bytes, rows[i].bytes, sizeof(k * sizeof(char)));
+			row_pivot.b = rows[i].b;
+			x = divide(rows[j].bytes[i],row_pivot.bytes[i] );
+			x_mul_row( x,row_pivot, k );
+			row_sub_row(rows[j] , row_pivot);
+			if(rows[j].bytes[i] != 0 )
+			{
+				error("calculate_secret_bytes: ERROR!!!");
+			}
+
+		}
+
+	}
+	//For every row sum all coeff * x_j and get the x_i
+	unsigned char sum;
+	for(i = (k-1); i <= 0 ; ++i)
+	{
+		sum = 0;
+		for(j = i ; j < k ; ++j)
+		{
+			sum = sum(sum, mul(recover_bytes[j], rows[i].bytes[j]));
+		}
+		sum = sub(rows[i].b , sum);
+		recover_bytes[i] = divide(sum, rows[i].bytes[i]);
+	}
+	return OK;
+}
+
+
+int
+get_secret(int k,simple_8bits_BMP_t ** shadows )
+{
+	unsigned char*  bs = my_malloc(k * sizeof(unsigned char));
+	int status = OK;
+	unsigned char ** bytes = my_malloc(k  * sizeof(char*));
+	unsigned char * recover_bytes = my_malloc(k * sizeof(char));
+	if(k < 2 || k > 4 || shadows ==NULL)
+	{
+		error("get_secret: Error in the paramenters");
+		return ERROR;
+	}
+	int i = 0;
+	unsigned char ** bytes = my_malloc(k * sizeof(char*));
+	img_with_state_t ** shads = my_malloc(sizeof(img_with_state_t*) * k);
+
+	for(i =0 ; i < k ; ++i)
+	{
+		shads[i] = new_one_step_in_img(shadows[i], k);
+	}
+	for(i = 0 ; i < (shads[0]->img->dib_header->height * shads[0]->img->dib_header->width / k) + 1 ; ++i)
+	{
+		status = one_step_in_imgs(shads, k);
+		for (int j = 0; j < k; ++j) {
+			bs[j] = get_b_from_pixels(shads[j]->current_bytes);
+			bytes[j] = shads[j]->current_bytes;
+			status = get_k_coefficients(bytes[j], k, bytes[j]);
+			status = calculate_secret_bytes(bytes, bs, recover_bytes, k );
+		}
+	}
+
+	return OK;
 }
 
 int
