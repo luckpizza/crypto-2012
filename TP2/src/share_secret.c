@@ -13,7 +13,7 @@
 #include "bitmap.h"
 #include "share_secret_utils.h"
 #include "bite_wise.h"
-
+#include "mod251_operations.h"
 
 typedef struct img_with_state{
 	simple_8bits_BMP_t * img;
@@ -136,14 +136,24 @@ one_step_in_imgs(img_with_state_t ** img, int n)
 void
 swap_rows( row_t * a, row_t * b)
 {
-	row_t * tmp = a;
-	a = b;
-	b = tmp;
+	row_t tmp;
+	tmp.b = a->b;
+	tmp.bytes = a->bytes;
+	tmp.index = a->index;
+	a->b = b->b;
+	a->bytes = b->bytes;
+	a->index = b->index;
+	b->b = tmp.b;
+	b->bytes = tmp.bytes;
+	b->index = tmp.index;
+//
+//	a = b;
+//	b = tmp;
 }
 void
 swap_bytes(unsigned char ** a, unsigned char ** b)
 {
-	char ** tmp;
+	unsigned char ** tmp;
 	tmp = a;
 	a = b;
 	b = tmp;
@@ -152,7 +162,7 @@ swap_bytes(unsigned char ** a, unsigned char ** b)
 void
 swap_char( unsigned char *a, unsigned char *b)
 {
-	char * tmp;
+	unsigned char * tmp;
 	tmp = a;
 	a = b;
 	b = tmp;
@@ -161,7 +171,8 @@ swap_char( unsigned char *a, unsigned char *b)
 void
 x_mul_bytes(unsigned char x, unsigned char * bytes, int k)
 {
-	for (int i = 0; i < k; ++i) {
+	int i;
+	for ( i = 0; i < k; ++i) {
 		bytes[i] = mul(bytes[i], x);
 	}
 }
@@ -177,7 +188,8 @@ x_mul_row(unsigned char x, row_t * row, int k)
 void
 row_sub_row(row_t * a, row_t * b, int k)
 {
-	for (int i = 0; i < k; ++i) {
+	int i;
+	for ( i = 0; i < k; ++i) {
 		a->bytes[i] = sub(a->bytes[i], b->bytes[i]);
 	}
 	a->b = sub(a->b , b->b);
@@ -221,7 +233,7 @@ calculate_secret_bytes(unsigned char **bytes,unsigned char * bs, unsigned char *
 		{
 			if(rows[i].bytes[j] != 0)
 			{
-				swap_rows(rows[i], rows[j]);
+				swap_rows(&rows[i], &rows[j]);
 				break;
 			}
 		}
@@ -231,11 +243,11 @@ calculate_secret_bytes(unsigned char **bytes,unsigned char * bs, unsigned char *
 		{
 			if(rows[j].bytes[i] == 0)
 				continue;
-			memcpy(row_pivot.bytes, rows[i].bytes, sizeof(k * sizeof(char)));
+			memcpy(row_pivot.bytes, rows[i].bytes, k * sizeof(char));
 			row_pivot.b = rows[i].b;
 			x = divide(rows[j].bytes[i],row_pivot.bytes[i] );
-			x_mul_row( x,row_pivot, k );
-			row_sub_row(rows[j] , row_pivot);
+			x_mul_row( x,&row_pivot, k );
+			row_sub_row(&rows[j] , &row_pivot, k);
 			if(rows[j].bytes[i] != 0 )
 			{
 				error("calculate_secret_bytes: ERROR!!!");
@@ -245,27 +257,27 @@ calculate_secret_bytes(unsigned char **bytes,unsigned char * bs, unsigned char *
 
 	}
 	//For every row sum all coeff * x_j and get the x_i
-	unsigned char sum;
-	for(i = (k-1); i <= 0 ; ++i)
+	unsigned char suma;
+	for(i = (k-1); i >= 0 ; --i)
 	{
-		sum = 0;
+		suma = 0;
 		for(j = i ; j < k ; ++j)
 		{
-			sum = sum(sum, mul(recover_bytes[j], rows[i].bytes[j]));
+			suma = sum(suma, mul(recover_bytes[j], rows[i].bytes[j]));
 		}
-		sum = sub(rows[i].b , sum);
-		recover_bytes[i] = divide(sum, rows[i].bytes[i]);
+		suma = sub(rows[i].b , suma);
+		recover_bytes[i] = divide(suma, rows[i].bytes[i]);
 	}
 	return OK;
 }
 
 
 int
-get_secret(int k,simple_8bits_BMP_t ** shadows )
+get_secret(int k,simple_8bits_BMP_t ** shadows, simple_8bits_BMP_t * secret )
 {
 	unsigned char*  bs = my_malloc(k * sizeof(unsigned char));
 	int status = OK;
-	unsigned char ** bytes = my_malloc(k  * sizeof(char*));
+//	unsigned char ** bytes = my_malloc(k  * sizeof(char*));
 	unsigned char * recover_bytes = my_malloc(k * sizeof(char));
 	if(k < 2 || k > 4 || shadows ==NULL)
 	{
@@ -273,21 +285,27 @@ get_secret(int k,simple_8bits_BMP_t ** shadows )
 		return ERROR;
 	}
 	int i = 0;
+	int j = 0;
 	unsigned char ** bytes = my_malloc(k * sizeof(char*));
 	img_with_state_t ** shads = my_malloc(sizeof(img_with_state_t*) * k);
-
+	img_with_state_t * sec = new_one_step_in_img(secret, k);
 	for(i =0 ; i < k ; ++i)
 	{
 		shads[i] = new_one_step_in_img(shadows[i], k);
 	}
 	for(i = 0 ; i < (shads[0]->img->dib_header->height * shads[0]->img->dib_header->width / k) + 1 ; ++i)
 	{
+		status = one_step_in_img(sec);
 		status = one_step_in_imgs(shads, k);
-		for (int j = 0; j < k; ++j) {
-			bs[j] = get_b_from_pixels(shads[j]->current_bytes);
+		for (j = 0; j < k; ++j) {
+			bs[j] = get_b_from_pixels(k,shads[j]->current_bytes);
 			bytes[j] = shads[j]->current_bytes;
 			status = get_k_coefficients(bytes[j], k, bytes[j]);
-			status = calculate_secret_bytes(bytes, bs, recover_bytes, k );
+		}
+		status = calculate_secret_bytes(bytes, bs, recover_bytes, k );
+		for ( j = 0; j < k; ++j)
+		{
+			sec->current_bytes[j] = recover_bytes[j];
 		}
 	}
 

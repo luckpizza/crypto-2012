@@ -35,4 +35,13 @@ get_md5_parity_bit(const unsigned char * src, int lenght);
 int
 get_k_coefficients_no_cero(const unsigned char *src , int k, unsigned char *dst );
 
+
+int
+get_k_coefficients(const unsigned char *src , int k, unsigned char *dst );
+
+/*
+ * it already have the parity bit in 0
+ */
+unsigned char
+get_b_from_pixels( int k, unsigned char *dst );
 #endif /* BITE_WISE_H_ */

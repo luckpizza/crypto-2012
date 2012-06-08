@@ -8,6 +8,7 @@
 #include "bitmap.h"
 #include "debug.h"
 #include "memory_utils.h"
+#include "status_definitions.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -86,7 +87,7 @@ save_bmp_to_file( simple_8bits_BMP_t* img, char * file_path)
 	if (!file)
 		{
 			fprintf(stderr, "Unable to open file %s", file_path);
-			return NULL;
+			return ERROR;
 		}
 	fwrite(&img->signature, 2, 1, file );
 

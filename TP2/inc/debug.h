@@ -10,7 +10,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#define DEBUG1 1
+//#define DEBUG1
 #define INFO 1
 #define NO_ERROR 1
 #ifdef DEBUG1
