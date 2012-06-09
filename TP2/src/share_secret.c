@@ -7,6 +7,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include "status_definitions.h"
 #include "memory_utils.h"
 #include "debug.h"
@@ -150,22 +151,22 @@ swap_rows( row_t * a, row_t * b)
 //	a = b;
 //	b = tmp;
 }
-void
-swap_bytes(unsigned char ** a, unsigned char ** b)
-{
-	unsigned char ** tmp;
-	tmp = a;
-	a = b;
-	b = tmp;
-}
+//void
+//swap_bytes(unsigned char ** a, unsigned char ** b)
+//{
+//	unsigned char ** tmp;
+//	tmp = a;
+//	a = b;
+//	b = tmp;
+//}
 
 void
 swap_char( unsigned char *a, unsigned char *b)
 {
-	unsigned char * tmp;
-	tmp = a;
-	a = b;
-	b = tmp;
+	unsigned char  tmp;
+	tmp = *a;
+	*a = *b;
+	*b = tmp;
 }
 
 void
@@ -205,6 +206,7 @@ calculate_secret_bytes(unsigned char **bytes,unsigned char * bs, unsigned char *
 	row_t * rows = my_malloc(k*sizeof(row_t));
 	row_t row_pivot;
 	row_pivot.bytes = my_malloc((k * sizeof(char)));
+	memset(recover_bytes, 0, k * sizeof(unsigned char));
 	//Check if we have a row or colum with only ones! if so --> error
 	for(i = 0 ; i < k; ++i)
 	{
