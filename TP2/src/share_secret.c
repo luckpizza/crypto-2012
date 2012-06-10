@@ -76,38 +76,25 @@ one_step_in_img(img_with_state_t * img)
 		{
 			img->j =0;
 			img->i++;
-		}
-		while(idx < img->k)
-		{
-
-			img->img->img[img->i][img->j] = img->current_bytes[idx];
-			++img->j;
-			//			if(img->j == img->img->dib_header->width )
-			if(img->j == img->img->dib_header->width )
-			{
-				img->i++;
-				img->j = 0;
-			}
 			if(img->i == img->img->dib_header->height)
 			{
 				debug(" one_step_in_img : We reach the end of the image");
 				img->i = -1; //Invalidate the image so it can't enter to this function any more!
 				return DONE;
 			}
-			//			if(img->j < img->img->dib_header->width -1)
-			//			{
-			//				img->img->img[img->i][img->j] = img->current_bytes[idx];
-			//				++img->j;
-			//			}else if(img->i < (img->img->dib_header->height -1))
-			//			{
-			//				++img->i;
-			//				img->j = 0;
-			//				img->img->img[img->i][img->j] = img->current_bytes[idx];
-			//			}else
-			//			{
-			//				error(" one_step_in_img error  ... trying to modify more height than permited");
-			//				return ERROR;
-			//			}
+
+		}
+		while(idx < img->k)
+		{
+
+			img->img->img[img->i][img->j] = img->current_bytes[idx];
+			++img->j;
+			if(img->i == img->img->dib_header->height)
+			{
+				debug(" one_step_in_img : We reach the end of the image");
+				img->i = -1; //Invalidate the image so it can't enter to this function any more!
+				return DONE;
+			}
 			++idx;
 		}
 	}
@@ -124,26 +111,6 @@ one_step_in_img(img_with_state_t * img)
 	{
 		j =0;
 		i++;
-	}
-	if(i == img->img->dib_header->height)
-	{
-		debug(" one_step_in_img : We reach the end of the image");
-		img->i = -1; //Invalidate the image so it can't enter to this function any more!
-		return DONE;
-	}
-	while(idx < img->k)
-	{
-		img->current_bytes[idx] = img->img->img[i][j];
-		j++;
-		//			if(img->j == img->img->dib_header->width)
-
-
-		if(j == img->img->dib_header->width)
-
-		{
-			i++;
-			j = 0;
-		}
 		if(i == img->img->dib_header->height)
 		{
 			debug(" one_step_in_img : We reach the end of the image");
@@ -151,21 +118,11 @@ one_step_in_img(img_with_state_t * img)
 			return DONE;
 		}
 
-		//		if(j < (img->img->dib_header->width-1))
-		//		{
-		//			 img->current_bytes[idx] = img->img->img[i][j];
-		//			++j;
-		//		}else if(i < (img->img->dib_header->height -1))
-		//		{
-		//			++i;
-		//			j = 0;
-		//			 img->current_bytes[idx] = img->img->img[i][j];
-		//		}else
-		//		{
-		//			debug(" one_step_in_img : We reach the end of the image");
-		//			img->i = -1; //Invalidate the image so it can't enter to this function any more!
-		//			return DONE;
-		//		}
+	}
+	while(idx < img->k)
+	{
+		img->current_bytes[idx] = img->img->img[i][j];
+		j++;
 		++idx;
 	}
 	return OK;
