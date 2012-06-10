@@ -72,22 +72,42 @@ one_step_in_img(img_with_state_t * img)
 	}
 	if(img->current_bytes != NULL)
 	{
+		if((img->j + img->k) >= img->img->dib_header->width)
+		{
+			img->j =0;
+			img->i++;
+		}
 		while(idx < img->k)
 		{
-			if(img->j < img->img->dib_header->width -1)
+
+			img->img->img[img->i][img->j] = img->current_bytes[idx];
+			++img->j;
+			//			if(img->j == img->img->dib_header->width )
+			if(img->j == img->img->dib_header->width )
 			{
-				img->img->img[img->i][img->j] = img->current_bytes[idx];
-				++img->j;
-			}else if(img->i < (img->img->dib_header->height -1))
-			{
-				++img->i;
+				img->i++;
 				img->j = 0;
-				img->img->img[img->i][img->j] = img->current_bytes[idx];
-			}else
-			{
-				error(" one_step_in_img error  ... trying to modify more height than permited");
-				return ERROR;
 			}
+			if(img->i == img->img->dib_header->height)
+			{
+				debug(" one_step_in_img : We reach the end of the image");
+				img->i = -1; //Invalidate the image so it can't enter to this function any more!
+				return DONE;
+			}
+			//			if(img->j < img->img->dib_header->width -1)
+			//			{
+			//				img->img->img[img->i][img->j] = img->current_bytes[idx];
+			//				++img->j;
+			//			}else if(img->i < (img->img->dib_header->height -1))
+			//			{
+			//				++img->i;
+			//				img->j = 0;
+			//				img->img->img[img->i][img->j] = img->current_bytes[idx];
+			//			}else
+			//			{
+			//				error(" one_step_in_img error  ... trying to modify more height than permited");
+			//				return ERROR;
+			//			}
 			++idx;
 		}
 	}
@@ -100,23 +120,52 @@ one_step_in_img(img_with_state_t * img)
 	idx = 0;
 	j = img->j ;
 	i = img->i;
+	if((j + img->k) >= img->img->dib_header->width)
+	{
+		j =0;
+		i++;
+	}
+	if(i == img->img->dib_header->height)
+	{
+		debug(" one_step_in_img : We reach the end of the image");
+		img->i = -1; //Invalidate the image so it can't enter to this function any more!
+		return DONE;
+	}
 	while(idx < img->k)
 	{
-		if(j < (img->img->dib_header->width-1))
+		img->current_bytes[idx] = img->img->img[i][j];
+		j++;
+		//			if(img->j == img->img->dib_header->width)
+
+
+		if(j == img->img->dib_header->width)
+
 		{
-			 img->current_bytes[idx] = img->img->img[i][j];
-			++j;
-		}else if(i < (img->img->dib_header->height -1))
-		{
-			++i;
+			i++;
 			j = 0;
-			 img->current_bytes[idx] = img->img->img[i][j];
-		}else
+		}
+		if(i == img->img->dib_header->height)
 		{
 			debug(" one_step_in_img : We reach the end of the image");
 			img->i = -1; //Invalidate the image so it can't enter to this function any more!
 			return DONE;
 		}
+
+		//		if(j < (img->img->dib_header->width-1))
+		//		{
+		//			 img->current_bytes[idx] = img->img->img[i][j];
+		//			++j;
+		//		}else if(i < (img->img->dib_header->height -1))
+		//		{
+		//			++i;
+		//			j = 0;
+		//			 img->current_bytes[idx] = img->img->img[i][j];
+		//		}else
+		//		{
+		//			debug(" one_step_in_img : We reach the end of the image");
+		//			img->i = -1; //Invalidate the image so it can't enter to this function any more!
+		//			return DONE;
+		//		}
 		++idx;
 	}
 	return OK;
@@ -147,9 +196,9 @@ swap_rows( row_t * a, row_t * b)
 	b->b = tmp.b;
 	b->bytes = tmp.bytes;
 	b->index = tmp.index;
-//
-//	a = b;
-//	b = tmp;
+	//
+	//	a = b;
+	//	b = tmp;
 }
 //void
 //swap_bytes(unsigned char ** a, unsigned char ** b)
@@ -278,7 +327,7 @@ get_secret(int k,simple_8bits_BMP_t ** shadows, simple_8bits_BMP_t * secret )
 {
 	unsigned char*  bs = my_malloc(k * sizeof(unsigned char));
 	int status = OK;
-//	unsigned char ** bytes = my_malloc(k  * sizeof(char*));
+	//	unsigned char ** bytes = my_malloc(k  * sizeof(char*));
 	unsigned char * recover_bytes = my_malloc(k * sizeof(char));
 	if(k < 2 || k > 4 || shadows ==NULL)
 	{
@@ -347,7 +396,7 @@ share_secret(int k, int n, simple_8bits_BMP_t * secret, simple_8bits_BMP_t ** sh
 			b = calculate_b(bytes[j], sec->current_bytes, k);
 			save_b_to_coefficients(b, k,bytes[j]);
 		}
-	//	cal
+		//	cal
 	}
 	my_free(bytes);
 	return OK;

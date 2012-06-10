@@ -24,10 +24,10 @@
 //
 //	simple_8bits_BMP_t * sec;
 //
-//	img1 = load_bmp_from_file("./misc/catedra/v1/4sombras/Angelina4.bmp");
-//	img2 = load_bmp_from_file("./misc/catedra/v1/4sombras/Jim4.bmp");
-//	img3 = load_bmp_from_file("./misc/catedra/v1/4sombras/Roberto4.bmp");
-//	img4 = load_bmp_from_file("./misc/catedra/v1/4sombras/Whitney4.bmp");
+//	img1 = load_bmp_from_file("./misc/catedra/v2/4sombras/Angelina4.bmp");
+//	img2 = load_bmp_from_file("./misc/catedra/v2/4sombras/Jim4.bmp");
+//	img3 = load_bmp_from_file("./misc/catedra/v2/4sombras/Roberto4.bmp");
+//	img4 = load_bmp_from_file("./misc/catedra/v2/4sombras/Whitney4.bmp");
 //
 //	sec = load_bmp_from_file("./misc/catedra/v2/4sombras/Susan4.bmp");
 //
@@ -163,8 +163,8 @@
 //	save_bmp_to_file(sec, "./misc/sec.bmp");
 //	printf("img is %p", img1);
 //}
-//
-//
+
+
 
 int
 main(void)
