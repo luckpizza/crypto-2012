@@ -46,6 +46,44 @@
 //
 //}
 
+//
+///* THE GOOD ONEs!
+// * It already have th parity bit in 0
+// */
+//int
+//get_k_coefficients(const unsigned char *src , int k, unsigned char *dst )
+//{
+//	int rta = OK;
+//	switch (k) {
+//		case 2:
+//			dst[0] = src[0] >>5;
+//			dst[1] = src[1] >>4;
+//			debug("getting Coefficients for k = 2 d1 = %d", dst[1]);
+//			break;
+//		case 3:
+//			dst[0] = src[0] >>3;
+//			dst[1] = src[1] >>3;
+//			dst[2] = src[2] >>3;
+//			debug("getting Coefficients for k = 3 d1 = %d ,  d2 = %d , d3= %d \n", dst[0], dst[1], dst[2]);
+//
+//			break;
+//		case 4:
+//			dst[0] = src[0] >>3;
+//			dst[1] = src[1] >>2;
+//			dst[2] = src[2] >>2;
+//			dst[3] = src[3] >>2;
+//			debug("getting Coefficients for k = 4 d1 = %d", dst[1]);
+//
+//			break;
+//		default:
+//			rta = ERROR;
+//			break;
+//	}
+//	return rta;
+//
+//}
+
+
 
 /* THE GOOD ONEs!
  * It already have th parity bit in 0
@@ -140,40 +178,6 @@ save_b_to_coefficients(const unsigned char b , int k, unsigned char *dst )
 		return rta;
 }
 
-/*
- * it already have the parity bit in 0
- */
-unsigned char
-get_b_from_pixels( int k, unsigned char *dst )
-{// unsigned char b = 0xFF;
-	unsigned char b = 0;
- 		switch (k) {
-			case 2:
-				b = (dst[1] & 0x0F)<<4;
-				b = b | (dst[0] & 0x0F);
-				debug("getting b for k = 2 b = %d \n", b);
-				break;
-			case 3:
-				b = (dst[2] & 0x07);
-				b = (b<<3) | (dst[1] & 0x07);
-				b = (b<<2) | (dst[0] & 0x03);
-				debug("getting b for k = 3 b = %d \n", b);
-				break;
-			case 4:
-				b = (dst[3] & 0x03);
-				b = (b<<2) | (dst[2] & 0x03);
-				b = (b<<2) | (dst[1] & 0x03);
-				b = (b<<2) | (dst[0] & 0x03);
-				debug("getting b for k = 4 b = %d \n", b);
-				break;
-			default:
-				error("get_b_from_pixels error");
-				b = 255;
-				break;
-		}
-		return b;
-}
-
 ///*
 // * it already have the parity bit in 0
 // */
@@ -183,21 +187,21 @@ get_b_from_pixels( int k, unsigned char *dst )
 //	unsigned char b = 0;
 // 		switch (k) {
 //			case 2:
-//				b = (dst[0] & 0x0F);
-//				b = (b<<4) | (dst[1] & 0x0F);
+//				b = (dst[1] & 0x0F)<<4;
+//				b = b | (dst[0] & 0x0F);
 //				debug("getting b for k = 2 b = %d \n", b);
 //				break;
 //			case 3:
-//				b = (dst[0] & 0x03);
+//				b = (dst[2] & 0x07);
 //				b = (b<<3) | (dst[1] & 0x07);
-//				b = (b<<3) | (dst[2] & 0x07);
+//				b = (b<<2) | (dst[0] & 0x03);
 //				debug("getting b for k = 3 b = %d \n", b);
 //				break;
 //			case 4:
-//				b = (dst[0] & 0x03);
-//				b = (b<<2) | (dst[1] & 0x03);
+//				b = (dst[3] & 0x03);
 //				b = (b<<2) | (dst[2] & 0x03);
-//				b = (b<<2) | (dst[3] & 0x03);
+//				b = (b<<2) | (dst[1] & 0x03);
+//				b = (b<<2) | (dst[0] & 0x03);
 //				debug("getting b for k = 4 b = %d \n", b);
 //				break;
 //			default:
@@ -207,6 +211,41 @@ get_b_from_pixels( int k, unsigned char *dst )
 //		}
 //		return b;
 //}
+
+/*
+ * it already have the parity bit in 0
+ */
+unsigned char
+get_b_from_pixels( int k, unsigned char *dst )
+{// unsigned char b = 0xFF;
+	unsigned char b = 0;
+ 		switch (k) {
+			case 2:
+				b = (dst[0] & 0x0F);
+				b = (b<<4) | (dst[1] & 0x0F);
+				debug("getting b for k = 2 b = %d \n", b);
+				break;
+			case 3:
+				b = (dst[0] & 0x03);
+				b = (b<<3) | (dst[1] & 0x07);
+				b = (b<<3) | (dst[2] & 0x07);
+				debug("getting b for k = 3 b = %d \n", b);
+				break;
+			case 4:
+				b = (dst[0] & 0x03);
+				b = (b<<2) | (dst[1] & 0x03);
+				b = (b<<2) | (dst[2] & 0x03);
+				b = (b<<2) | (dst[3] & 0x03);
+				debug("getting b for k = 4 b = %d \n", b);
+				break;
+			default:
+				error("get_b_from_pixels error");
+				fprintf(stderr, "ERROR");
+				b = 255;
+				break;
+		}
+		return b;
+}
 
 
 

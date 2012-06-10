@@ -74,7 +74,7 @@ one_step_in_img(img_with_state_t * img)
 	{
 		while(idx < img->k)
 		{
-			if(img->j < img->img->dib_header->width)
+			if(img->j < img->img->dib_header->width -1)
 			{
 				img->img->img[img->i][img->j] = img->current_bytes[idx];
 				++img->j;
@@ -102,7 +102,7 @@ one_step_in_img(img_with_state_t * img)
 	i = img->i;
 	while(idx < img->k)
 	{
-		if(j < img->img->dib_header->width)
+		if(j < (img->img->dib_header->width-1))
 		{
 			 img->current_bytes[idx] = img->img->img[i][j];
 			++j;
@@ -229,17 +229,16 @@ calculate_secret_bytes(unsigned char **bytes,unsigned char * bs, unsigned char *
 	////
 
 	//Start gauss
-	for(i = 0 ; i < k ; ++i)
+	for(i = 0 ; i < k- 1 ; ++i)
 	{
 		for(j = i ; j < k ; ++j)
 		{
-			if(rows[i].bytes[j] != 0)
+			if(rows[j].bytes[i] != 0)
 			{
 				swap_rows(&rows[i], &rows[j]);
 				break;
 			}
 		}
-		error("calculate_secret_bytes : The equations where linear or an error has ocurre!");
 		unsigned char x = 0;
 		for(j = (i + 1) ; j < k ; ++j)
 		{
@@ -252,7 +251,7 @@ calculate_secret_bytes(unsigned char **bytes,unsigned char * bs, unsigned char *
 			row_sub_row(&rows[j] , &row_pivot, k);
 			if(rows[j].bytes[i] != 0 )
 			{
-				error("calculate_secret_bytes: ERROR!!!");
+				fprintf(stderr, "calculate_secret_bytes: ERROR!!!");
 			}
 
 		}

@@ -33,7 +33,11 @@ calculate_b(unsigned char * coefficients,unsigned char * secret_bytes, int k)
 void modify_one_byte(unsigned char *data, int k)
 {
 	int i = (((double)rand()) /RAND_MAX) * (k-1);
-	data[i] = (data[i] + 1) %251;
+//	if(data[i] > 240 ){
+//	data[i] = (data[i] - 12) %251;
+//	}else{
+		data[i] = (data[i]+1) %251;
+//	}
 }
 
 int
