@@ -13,7 +13,7 @@
 #include "debug.h"
 #include "bitmap.h"
 #include "share_secret_utils.h"
-#include "bite_wise.h"
+#include "bit_wise.h"
 #include "mod251_operations.h"
 
 typedef struct img_with_state{
@@ -303,8 +303,21 @@ get_secret(int k,simple_8bits_BMP_t ** shadows, simple_8bits_BMP_t * secret )
 	for(i = 0 ; i < (shads[0]->img->dib_header->height * shads[0]->img->dib_header->width / k) + 1 ; ++i)
 	{
 		status = one_step_in_img(sec);
+		if(status == DONE)
+				{
+					return OK;
+				}
 		status = one_step_in_imgs(shads, k);
+		if(status == DONE)
+		{
+			return OK;
+		}
 		for (j = 0; j < k; ++j) {
+			if(validate_bytes(shads[j]->current_bytes, k) == ERROR)
+			{
+				fprintf(stderr, " \n File is has not a secret! \n exiting \n");
+				exit(-1);
+			}
 			bs[j] = get_b_from_pixels(k,shads[j]->current_bytes);
 			bytes[j] = shads[j]->current_bytes;
 			status = get_k_coefficients(bytes[j], k, bytes[j]);

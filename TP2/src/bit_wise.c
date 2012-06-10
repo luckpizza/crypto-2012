@@ -7,6 +7,8 @@
 
 #include "debug.h"
 #include "status_definitions.h"
+#include "bit_wise.h"
+#include "memory_utils.h"
 #include <openssl/md5.h>
 
 
@@ -149,6 +151,7 @@ int
 save_b_to_coefficients(const unsigned char b , int k, unsigned char *dst )
 {// unsigned char b = 0xFF;
 	int rta = OK;
+	unsigned char xor;
 		switch (k) {
 			case 2:
 				dst[1] = (dst[1]<<4 & 0xE0) | (b & 0x0F);
@@ -164,10 +167,10 @@ save_b_to_coefficients(const unsigned char b , int k, unsigned char *dst )
 
 				break;
 			case 4:
-				dst[3] = (dst[3]<<3 & 0xF8) | (b & 0x03);
+				dst[3] = (dst[3]<<2 & 0xF8) | (b & 0x03);
 				dst[2] = (dst[2]<<2 & 0xFC) | (b>>2 & 0x03);
 				dst[1] = (dst[1]<<2 & 0xFC) | (b>>4 & 0x03);
-				dst[0] = (dst[0]<<2 & 0xFC) | (b>>6 & 0x03);
+				dst[0] = (dst[0]<<3 & 0xFC) | (b>>6 & 0x03);
 				debug("getting Coefficients for k = 4 d1 = %d", dst[1]);
 
 				break;
@@ -175,6 +178,12 @@ save_b_to_coefficients(const unsigned char b , int k, unsigned char *dst )
 				rta = ERROR;
 				break;
 		}
+		xor = get_md5_parity_bit(dst, k);
+		if(k == 3 || k == 4)
+			dst[0] = dst[0] | xor<<2;
+		else if(k==2)
+			dst[0] = dst[0] | xor<<4;
+
 		return rta;
 }
 
@@ -281,21 +290,56 @@ get_b_from_pixels( int k, unsigned char *dst )
 //		}
 //		return rta;
 //}
+
+int
+validate_bytes(unsigned char * bits, int k)
+{
+	unsigned char parity = 0;
+	unsigned char xor = 0;
+	if(k == 3 || k == 4)
+	{
+		xor = bits[0] & 0x04;
+		bits[0] = bits[0] & 0xFB;
+		parity = get_md5_parity_bit(bits, k);
+		if((parity > 0 && xor > 0) || (xor == 0 && parity == 0 ))
+		{
+			return OK;
+		}
+		return ERROR;
+	}
+	else if(k==2)
+	{
+		xor = bits[0] & 0x10;
+		bits[0] = bits[0] & 0xEF;
+		parity = get_md5_parity_bit(bits, k);
+		if((parity > 0 && xor > 0) || (xor == 0 && parity == 0 ))
+		{
+			return OK;
+		}
+		return ERROR;
+
+	//	bits[0] = bits[0] | xor<<4;
+	}
+	return ERROR;
+}
 unsigned char
 xor_between_bits(const unsigned char * bits, int amount_of_bytes)
 {
 	int i = 0;
 	int j = 0;
 	unsigned char rta = 0x00;
+	rta = bits[i] & 0x01;
+	j++;
 	while( i < amount_of_bytes)
 	{
-		for( j = 0 ; j < 8; ++j){
-			rta = (bits[i]>>j & 0x01)^rta;
+		for(  ; j < 8; ++j){
+			rta = ((bits[i]>>j & 0x01)^rta)&0x01;
 
 		}
+		j = 0;
 		++i;
 	}
-	debug("final answer of xor_bits is %d", rta);
+//	printf("final answer of xor_bits is %d", rta);
 	return rta;
 
 }
@@ -303,8 +347,20 @@ xor_between_bits(const unsigned char * bits, int amount_of_bytes)
 unsigned char
 get_md5_parity_bit(const unsigned char * src, int lenght)
 {
+//	unsigned char asd[5];
+//	memset(asd, 0, 5);
+//	memcpy(asd, src, lenght);
 	unsigned char md5_digest[MD5_DIGEST_LENGTH];
-	MD5(src, lenght, md5_digest);
+	int i;
+	unsigned char *tmp = my_malloc(lenght * sizeof(unsigned char));
+
+	for( i = 0 ; i < lenght ; ++i)
+	{
+		tmp[i] = src[lenght-i-1];
+	}
+
+	MD5(tmp, lenght, md5_digest);
+	my_free(tmp);
 	return xor_between_bits(md5_digest, MD5_DIGEST_LENGTH);
   //  SHA256((unsigned char*) passwordAndSalt, strlen(passwordAndSalt), SHA256Password);
 
@@ -315,19 +371,21 @@ get_md5_parity_bit(const unsigned char * src, int lenght)
 //int
 //main(void)
 //{
-////	unsigned char src[3] = {0xFF, 0xFF, 0xFF};
-////	unsigned char dst[3] = {0x00 , 0x00, 0x00};
-//////	get_k_coefficients(src, 3, dst);
-////	unsigned char b = 0xFF;
-////	save_b_to_coefficients(b, 3, dst);
-//////	unsigned char b_bits = xor_between_bits(src, 3);
+//	unsigned char src[3] = {0x0E , 0x00, 0x00};
+//////	unsigned char dst[3] = {0x00 , 0x00, 0x00};
+////////	get_k_coefficients(src, 3, dst);
+//////	unsigned char b = 0xFF;
+//////	save_b_to_coefficients(b, 3, dst);
+//	unsigned char b_bits;
+//	b_bits= xor_between_bits(src, 3);
+//	printf("xor bites = %d",b_bits );
 ////	unsigned char b_bits = get_md5_parity_bit(src, 3);
-////	debug("FF div FF = %d \n", divide(0xFF, 0xFF));
-////	debug("CF div CF = %d \n", divide(0xCF, 0xCF));
-////	debug("FF div 11 = %d \n", divide(0xFF, 0x11));
-//	unsigned char src[3]  = {0x03, 0x07, 0x00};
-//	int b = get_b_from_pixels( 3, src);
-//	printf("b = %d", b);
+//////	debug("FF div FF = %d \n", divide(0xFF, 0xFF));
+//////	debug("CF div CF = %d \n", divide(0xCF, 0xCF));
+//////	debug("FF div 11 = %d \n", divide(0xFF, 0x11));
+////	unsigned char src[3]  = {0x03, 0x07, 0x00};
+////	int b = get_b_from_pixels( 3, src);
+////	printf("b = %d", b);
 //
 //}
 //

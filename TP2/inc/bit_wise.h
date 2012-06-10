@@ -44,4 +44,8 @@ get_k_coefficients(const unsigned char *src , int k, unsigned char *dst );
  */
 unsigned char
 get_b_from_pixels( int k, unsigned char *dst );
+
+
+unsigned char
+xor_between_bits(const unsigned char * bits, int amount_of_bytes);
 #endif /* BITE_WISE_H_ */
