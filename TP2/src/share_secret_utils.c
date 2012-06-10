@@ -33,10 +33,8 @@ calculate_b(unsigned char * coefficients,unsigned char * secret_bytes, int k)
 void modify_one_byte(unsigned char *data, int k)
 {
 	int i = (((double)rand()) /RAND_MAX) * (k-1);
-//	if(data[i] > 240 ){
-//	data[i] = (data[i] - 12) %251;
-//	}else{
-		data[i] = (data[i]+1) %251;
+	i = rand() % k;
+	data[i] = (data[i]+1) %251;
 //	}
 }
 
@@ -69,6 +67,30 @@ make_linear_independent(unsigned char ** data, int k , int n)
 
 	}
 	return OK;
+}
+
+int
+check_coefficients(unsigned char ** data, int k , int n)
+{
+	int i = 0;
+	int j = 0;
+	unsigned char tmp = 0;
+	int idx = 0;
+	for(i = 0; i < k; ++i)
+	{
+		for(j = 0; j < k; ++j)
+		{
+			tmp = data[j][i] | tmp;
+			if(tmp > 0)
+				continue;
+		}
+		if(tmp == 0)
+		{
+			idx = rand() % k;
+			data[idx][i] = 0x01;
+		}
+	}
+	return 1;
 }
 
 /**

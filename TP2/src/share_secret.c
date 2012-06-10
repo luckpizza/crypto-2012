@@ -323,8 +323,14 @@ get_secret(int k,simple_8bits_BMP_t ** shadows, simple_8bits_BMP_t * secret )
 			status = get_k_coefficients(bytes[j], k, bytes[j]);
 		}
 		status = calculate_secret_bytes(bytes, bs, recover_bytes, k );
+
 		for ( j = 0; j < k; ++j)
 		{
+			//TODO: DELETE!
+				if(recover_bytes[j] == 0)
+				{
+					printf("rec byte is 0");
+				}
 			sec->current_bytes[j] = recover_bytes[j];
 		}
 	}
@@ -360,6 +366,7 @@ share_secret(int k, int n, simple_8bits_BMP_t * secret, simple_8bits_BMP_t ** sh
 			bytes[j] = shads[j]->current_bytes;
 			get_k_coefficients_no_cero(bytes[j], k, bytes[j]);
 		}
+		check_coefficients(bytes, k, n);
 		make_linear_independent(bytes, k, n);
 		for(j = 0; j< n ; ++j)
 		{

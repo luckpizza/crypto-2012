@@ -132,14 +132,26 @@ get_k_coefficients_no_cero(const unsigned char *src , int k, unsigned char *dst 
 {
 	int i = 0;
 	int tmp = 0;
-	if(get_k_coefficients(src, k, dst) == ERROR)
+	for(i = 0 ; i < k ; ++i)
+	{
+		if(src[i] > 251)
+		{
+			dst[i] = 250;
+		}else
+		{
+			dst[i] = src[i];
+		}
+	}
+	if(get_k_coefficients(dst, k, dst) == ERROR)
 		return ERROR;
 	for (i = 0; i < k; ++i)
 	{
 		if( dst[i] != 0 )
 			return OK;
 	}
-	i = (((double)rand()) /RAND_MAX) * (k-1);
+	i = rand() % k;
+
+	//i = (((double)rand()) /RAND_MAX) * (k-1);
 	dst[i] = 0x01;
 	return OK;
 }
@@ -154,8 +166,8 @@ save_b_to_coefficients(const unsigned char b , int k, unsigned char *dst )
 	unsigned char xor;
 		switch (k) {
 			case 2:
-				dst[1] = (dst[1]<<4 & 0xE0) | (b & 0x0F);
-				dst[0] = (dst[0]<<5 & 0xF0) |  (b >>4);
+				dst[1] = (dst[1]<<4 & 0xF0) | (b & 0x0F);
+				dst[0] = (dst[0]<<5 & 0xE0) |  (b >>4);
 				debug("getting Coefficients for k = 2 d1 = %d", dst[1]);
 				break;
 			case 3:
@@ -167,7 +179,7 @@ save_b_to_coefficients(const unsigned char b , int k, unsigned char *dst )
 
 				break;
 			case 4:
-				dst[3] = (dst[3]<<2 & 0xF8) | (b & 0x03);
+				dst[3] = (dst[3]<<2 & 0xFC) | (b & 0x03);
 				dst[2] = (dst[2]<<2 & 0xFC) | (b>>2 & 0x03);
 				dst[1] = (dst[1]<<2 & 0xFC) | (b>>4 & 0x03);
 				dst[0] = (dst[0]<<3 & 0xFC) | (b>>6 & 0x03);
@@ -322,26 +334,43 @@ validate_bytes(unsigned char * bits, int k)
 	}
 	return ERROR;
 }
+//unsigned char
+//xor_between_bits(const unsigned char * bits, int amount_of_bytes)
+//{
+//	int i = 0;
+//	int j = 0;
+//	unsigned char rta = 0x00;
+//	rta = bits[i] & 0x01;
+//	j++;
+//	while( i < amount_of_bytes)
+//	{
+//		for(  ; j < 8; ++j){
+//			rta = ((bits[i]>>j & 0x01)^rta)&0x01;
+//
+//		}
+//		j = 0;
+//		++i;
+//	}
+////	printf("final answer of xor_bits is %d", rta);
+//	return rta;
+//
+//}
+
 unsigned char
 xor_between_bits(const unsigned char * bits, int amount_of_bytes)
 {
 	int i = 0;
 	int j = 0;
 	unsigned char rta = 0x00;
-	rta = bits[i] & 0x01;
-	j++;
 	while( i < amount_of_bytes)
 	{
-		for(  ; j < 8; ++j){
-			rta = ((bits[i]>>j & 0x01)^rta)&0x01;
-
+		for( ; j < 8; ++j){
+			rta = ((bits[i]<<j & 0x01)^rta)&0x01;
 		}
 		j = 0;
 		++i;
 	}
-//	printf("final answer of xor_bits is %d", rta);
 	return rta;
-
 }
 
 unsigned char
