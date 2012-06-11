@@ -78,30 +78,14 @@ triangulate_matrix(row_t * rows, int k){
 	int rta = -1;
 	int tmp = 0;
 	int i,j,l;
+	int check1, check2;
+	int p,q;
 	char * recover_bytes = my_malloc(k*sizeof(char));
 	row_t row_pivot;
 	row_pivot.bytes = my_malloc((k * sizeof(char)));
 	memset(recover_bytes, 0, k * sizeof(unsigned char));
 	//Check if we have a row or colum with only ones! if so --> error
-//	for(i = 0 ; i < k; ++i)
-//	{
-//		check1 = 0;
-//		check2 = 0;
-//		for (j = 0; j < k; ++j)
-//		{
-//			check1 = check1 | bytes[j][i];
-//			check2 = check2 | bytes[i][j];
-//		}
-//		if(check1 == 0 || check2 ==0)
-//		{
-//			error("calculate_secret_bytes : there was a column or row with all ceros");
-//			return ERROR;
-//		}
-//		rows[i].b = bs[i];
-//		rows[i].bytes = my_malloc(k*sizeof(char*));
-//		memcpy(rows[i].bytes, data[i], k);
-//		rows[i].index = i;
-//	}
+
 	for(i = 0 ; i < k- 1 ; ++i)
 	{
 		for(j = i ; j < k ; ++j)
@@ -112,11 +96,22 @@ triangulate_matrix(row_t * rows, int k){
 				break;
 			}
 		}
+		if(rows[i].bytes[i] == 0)
+		{
+			rta = rows[i].index;
+			my_free(row_pivot.bytes);
+			my_free(recover_bytes);
+			return rta;
+		}
 		unsigned char x = 0;
 		for(j = (i + 1) ; j < k ; ++j)
 		{
-			if(rows[j].bytes[i] == 0)
-				continue;
+//			if(rows[j].bytes[i] == 0)
+//				continue;
+//			if(rows[j].bytes[i] != 0 )
+//			{
+//				fprintf(stderr, "calculate_secret_bytes: ERROR!!! \n");
+//			}
 			memcpy(row_pivot.bytes, rows[i].bytes, k * sizeof(char));
 			row_pivot.b = rows[i].b;
 			x = divide(rows[j].bytes[i],row_pivot.bytes[i] );
@@ -125,7 +120,7 @@ triangulate_matrix(row_t * rows, int k){
 			//TODO: Test if a row is all ceros and quit!!
 			if(rows[j].bytes[i] != 0 )
 			{
-				fprintf(stderr, "calculate_secret_bytes: ERROR!!!");
+				fprintf(stderr, "calculate_secret_bytes: ERROR!!! \n");
 			}
 			tmp = 0;
 			for(l = 0; l< k;++l )
@@ -135,20 +130,31 @@ triangulate_matrix(row_t * rows, int k){
 			if(tmp == 0)
 			{
 				rta = rows[j].index;
-//				my_free(row_pivot.bytes);
-//				my_free(recover_bytes);
-//				return rta;
-
+				my_free(row_pivot.bytes);
+				my_free(recover_bytes);
+				return rta;
 			}
+			if(rta == -1){
+				for(p = 0 ; p < k; ++p)
+				{
+					check1 = 0;
+					check2 = 0;
+					for (q = 0; q < k; ++q)
+					{
+						check1 = check1 | rows[q].bytes[p];
+						check2 = check2 | rows[p].bytes[q];
+					}
+					if(check1 == 0 || check2 ==0)
+					{
+						error("calculate_secret_bytes : there was a column or row with all ceros");
+						return ERROR;
+					}
 
+				}
+			}
 		}
 
 	}
-//	for(i = 0 ; i < k ; ++i)
-//	{
-//		my_free(rows[i].bytes);
-//	}
-//	my_free(rows);
 	my_free(row_pivot.bytes);
 	my_free(recover_bytes);
 	return rta;
@@ -238,7 +244,7 @@ make_linear_independent(unsigned char ** data, int k , int n)
 
 						if((idx_modified = triangulate_matrix(rows, k)) != -1)
 						{
-				//			printf("index modified %d \n", idx_modified);
+							//			printf("index modified %d \n", idx_modified);
 							modify_one_byte(data[idx_modified], k);
 							status = MODIFIED;
 						}
@@ -294,7 +300,7 @@ make_linear_independent(unsigned char ** data, int k , int n)
 							rows[3].index = m;
 							if((idx_modified = triangulate_matrix(rows, k)) != -1)
 							{
-						//		printf("index modified %d \n", idx_modified);
+								//		printf("index modified %d \n", idx_modified);
 								modify_one_byte(data[idx_modified], k);
 								status = MODIFIED;
 							}
@@ -310,8 +316,14 @@ make_linear_independent(unsigned char ** data, int k , int n)
 		}
 
 	}
-		return OK;
+
+	for(i = 0 ; i < k ; ++i)
+	{
+		my_free(rows[i].bytes);
 	}
+	my_free(rows);
+	return OK;
+}
 
 
 

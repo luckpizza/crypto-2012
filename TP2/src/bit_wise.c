@@ -182,7 +182,7 @@ save_b_to_coefficients(const unsigned char b , int k, unsigned char *dst )
 				dst[3] = (dst[3]<<2 & 0xFC) | (b & 0x03);
 				dst[2] = (dst[2]<<2 & 0xFC) | (b>>2 & 0x03);
 				dst[1] = (dst[1]<<2 & 0xFC) | (b>>4 & 0x03);
-				dst[0] = (dst[0]<<3 & 0xFC) | (b>>6 & 0x03);
+				dst[0] = (dst[0]<<3 & 0xF8) | (b>>6 & 0x03);
 				debug("getting Coefficients for k = 4 d1 = %d", dst[1]);
 
 				break;

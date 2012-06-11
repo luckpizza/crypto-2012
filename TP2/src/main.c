@@ -95,12 +95,12 @@ main(void)
 	shadows[1] = img2;
 	shadows[2] = img3;
 	shadows[3] = img4;
-	share_secret(2, 2, sec, shadows);
+	share_secret(4, 4, sec, shadows);
 	save_bmp_to_file(img1, "./misc/out1.bmp");
 	save_bmp_to_file(img2, "./misc/out2.bmp");
 	//save_bmp_to_file(img3, "./misc/out3.bmp");
 //	save_bmp_to_file(img4, "./misc/out4.bmp");
-	get_secret(2, shadows, sec);
+	get_secret(4, shadows, sec);
 
 	save_bmp_to_file(sec, "./misc/sec.bmp");
 	printf("\n img is %p \n", img1);

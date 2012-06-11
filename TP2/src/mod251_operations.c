@@ -55,7 +55,7 @@ divide(unsigned char a, unsigned char b)
 {
 	if(b == 0)
 	{
-//		printf("Dividing by 0!!\n");
+		printf("Dividing by 0!!\n");
 	}
 	int rta = 0;
 	if(inverse[b] == 0)
