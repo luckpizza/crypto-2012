@@ -9,6 +9,8 @@
 #include "debug.h"
 #include "status_definitions.h"
 #include "share_secret_utils.h"
+#include "memory_utils.h"
+#include "string.h"
 /**
  * given a group fo coefficients and secret bytes, it calculates the "b" to
  * be stored as a secret!
@@ -33,41 +35,290 @@ calculate_b(unsigned char * coefficients,unsigned char * secret_bytes, int k)
 void modify_one_byte(unsigned char *data, int k)
 {
 	int i = (((double)rand()) /RAND_MAX) * (k-1);
+	int to_move = 0;
 	i = rand() % k;
 	data[i] = (data[i]+1) %251;
+	if(data[i] == 0)
+		data[i] = 0x01;
+	if(k == 2){
+		to_move = 4;
+		if(i == 0){
+			to_move = 5;
+		}
+		if((data[i]<<to_move & 0xF0) == 0)
+		{
+			data[i] = 0x01;
+		}
+	}
+
+	if(k == 3){
+			to_move = 3;
+			if((data[i]<<to_move & 0xF8 ) == 0)
+			{
+				data[i] = 0x01;
+			}
+		}
+	if(k == 4){
+			to_move = 2;
+			if(i == 0){
+				to_move = 3;
+			}
+			if((data[i]<<to_move & 0xFC ) == 0)
+			{
+				data[i] = 0x01;
+			}
+		}
 //	}
 }
+
+
+int
+triangulate_matrix(row_t * rows, int k){
+//	row_t * rows = my_malloc(k*sizeof(row_t));
+	int rta = -1;
+	int tmp = 0;
+	int i,j,l;
+	char * recover_bytes = my_malloc(k*sizeof(char));
+	row_t row_pivot;
+	row_pivot.bytes = my_malloc((k * sizeof(char)));
+	memset(recover_bytes, 0, k * sizeof(unsigned char));
+	//Check if we have a row or colum with only ones! if so --> error
+//	for(i = 0 ; i < k; ++i)
+//	{
+//		check1 = 0;
+//		check2 = 0;
+//		for (j = 0; j < k; ++j)
+//		{
+//			check1 = check1 | bytes[j][i];
+//			check2 = check2 | bytes[i][j];
+//		}
+//		if(check1 == 0 || check2 ==0)
+//		{
+//			error("calculate_secret_bytes : there was a column or row with all ceros");
+//			return ERROR;
+//		}
+//		rows[i].b = bs[i];
+//		rows[i].bytes = my_malloc(k*sizeof(char*));
+//		memcpy(rows[i].bytes, data[i], k);
+//		rows[i].index = i;
+//	}
+	for(i = 0 ; i < k- 1 ; ++i)
+	{
+		for(j = i ; j < k ; ++j)
+		{
+			if(rows[j].bytes[i] != 0)
+			{
+				swap_rows(&rows[i], &rows[j]);
+				break;
+			}
+		}
+		unsigned char x = 0;
+		for(j = (i + 1) ; j < k ; ++j)
+		{
+			if(rows[j].bytes[i] == 0)
+				continue;
+			memcpy(row_pivot.bytes, rows[i].bytes, k * sizeof(char));
+			row_pivot.b = rows[i].b;
+			x = divide(rows[j].bytes[i],row_pivot.bytes[i] );
+			x_mul_row( x,&row_pivot, k );
+			row_sub_row(&rows[j] , &row_pivot, k);
+			//TODO: Test if a row is all ceros and quit!!
+			if(rows[j].bytes[i] != 0 )
+			{
+				fprintf(stderr, "calculate_secret_bytes: ERROR!!!");
+			}
+			tmp = 0;
+			for(l = 0; l< k;++l )
+			{
+				tmp = rows[j].bytes[l] | tmp;
+			}
+			if(tmp == 0)
+			{
+				rta = rows[j].index;
+//				my_free(row_pivot.bytes);
+//				my_free(recover_bytes);
+//				return rta;
+
+			}
+
+		}
+
+	}
+//	for(i = 0 ; i < k ; ++i)
+//	{
+//		my_free(rows[i].bytes);
+//	}
+//	my_free(rows);
+	my_free(row_pivot.bytes);
+	my_free(recover_bytes);
+	return rta;
+}
+
+
 
 int
 make_linear_independent(unsigned char ** data, int k , int n)
 {
 	int i = 0;
 	int j = 0;
+	int l = 0;
+	int m = 0;
+	int idx_modified;
 	int status = MODIFIED;
+	int idx_row;
+	row_t * rows;
+	rows= my_malloc(k * sizeof(row_t));
+	for(i = 0 ; i < k ; ++i)
+	{
+		rows[i].bytes = my_malloc(k * sizeof(unsigned char));
+	}
 	while(status != OK)
 	{
 		status = OK;
 		i = 0;
-		j = 0;
-		while(status == OK && i < n)
+		if(k == 2)
 		{
-			j = i + 1;
-			while(status == OK && j < n)
+			while(status == OK && i < n)
 			{
-				if(!are_linear_independent(data[i], data[j], k))
+				j = 0;
+				while(status == OK && j < n)
 				{
-					modify_one_byte(data[i], k);
-					status = MODIFIED;
+					if(j == i)
+					{
+						++j;
+						continue;
+					}
+					memcpy(rows[0].bytes, data[i], k);
+					rows[0].b = 0;
+					rows[0].index = i;
+					memcpy(rows[1].bytes, data[j], k);
+					rows[1].b = 0;
+					rows[1].index = j;
 
+					if((idx_modified = triangulate_matrix(rows, k)) != -1)
+					{
+						modify_one_byte(data[idx_modified], k);
+						status = MODIFIED;
+					}
+
+					++j;
 				}
-				++j;
+				++i;
 			}
-			++i;
+		}
+		if(k == 3)
+		{
+			while(status == OK && i < n)
+			{
+				j = 0;
+				while(status == OK && j < n)
+				{
+					l =0;
+					if(j == i)
+					{
+						++j;
+						continue;
+					}
+					while(status == OK && l < n)
+					{
+						if(l == i || l == j)
+						{
+							++l;
+							continue;
+						}
+						memcpy(rows[0].bytes, data[i], k);
+						rows[0].b = 0;
+						rows[0].index = i;
+						memcpy(rows[1].bytes, data[j], k);
+						rows[1].b = 0;
+						rows[1].index = j;
+						memcpy(rows[2].bytes, data[l], k);
+						rows[2].b = 0;
+						rows[2].index = l;
+
+						if((idx_modified = triangulate_matrix(rows, k)) != -1)
+						{
+				//			printf("index modified %d \n", idx_modified);
+							modify_one_byte(data[idx_modified], k);
+							status = MODIFIED;
+						}
+
+						++l;
+					}
+					++j;
+				}
+				++i;
+			}
+		}
+		if(k == 4)
+		{
+			while(status == OK && i < n)
+			{
+				j = 0;
+				while(status == OK && j < n)
+				{
+					l =0;
+					if(j == i)
+					{
+						++j;
+						continue;
+					}
+					while(status == OK && l < n)
+					{
+						m = 0;
+
+						if(l == i || l == j)
+						{
+							++l;
+							continue;
+						}
+						while(status == OK && m < n)
+						{
+							if(m == i || m == j || m == l)
+							{
+								++m;
+								continue;
+							}
+
+							memcpy(rows[0].bytes, data[i], k);
+							rows[0].b = 0;
+							rows[0].index = i;
+							memcpy(rows[1].bytes, data[j], k);
+							rows[1].b = 0;
+							rows[1].index = j;
+							memcpy(rows[2].bytes, data[l], k);
+							rows[2].b = 0;
+							rows[2].index = l;
+							memcpy(rows[3].bytes, data[m], k);
+							rows[3].b = 0;
+							rows[3].index = m;
+							if((idx_modified = triangulate_matrix(rows, k)) != -1)
+							{
+						//		printf("index modified %d \n", idx_modified);
+								modify_one_byte(data[idx_modified], k);
+								status = MODIFIED;
+							}
+							++m;
+						}
+
+						++l;
+					}
+					++j;
+				}
+				++i;
+			}
 		}
 
 	}
-	return OK;
-}
+		return OK;
+	}
+
+
+
+
+
+
+
 
 int
 check_coefficients(unsigned char ** data, int k , int n)
@@ -81,8 +332,8 @@ check_coefficients(unsigned char ** data, int k , int n)
 		for(j = 0; j < k; ++j)
 		{
 			tmp = data[j][i] | tmp;
-			if(tmp > 0)
-				continue;
+//			if(tmp > 0)
+//				continue;
 		}
 		if(tmp == 0)
 		{
@@ -118,6 +369,9 @@ are_linear_independent(unsigned char * v1, unsigned char * v2, int amount)
 	}
 	return NO;
 }
+
+
+
 
 //int
 //main(void)

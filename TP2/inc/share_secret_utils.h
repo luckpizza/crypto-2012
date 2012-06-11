@@ -8,6 +8,11 @@
 #ifndef SHARE_SECRET_UTILS_H_
 #define SHARE_SECRET_UTILS_H_
 
+typedef struct row{
+	unsigned char * bytes;
+	unsigned char b;
+	int index;
+}row_t;
 
 /**
  * given a group fo coefficients and secret bytes, it calculates the "b" to

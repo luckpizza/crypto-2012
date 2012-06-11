@@ -376,9 +376,6 @@ xor_between_bits(const unsigned char * bits, int amount_of_bytes)
 unsigned char
 get_md5_parity_bit(const unsigned char * src, int lenght)
 {
-//	unsigned char asd[5];
-//	memset(asd, 0, 5);
-//	memcpy(asd, src, lenght);
 	unsigned char md5_digest[MD5_DIGEST_LENGTH];
 	int i;
 	unsigned char *tmp = my_malloc(lenght * sizeof(unsigned char));
@@ -391,7 +388,6 @@ get_md5_parity_bit(const unsigned char * src, int lenght)
 	MD5(tmp, lenght, md5_digest);
 	my_free(tmp);
 	return xor_between_bits(md5_digest, MD5_DIGEST_LENGTH);
-  //  SHA256((unsigned char*) passwordAndSalt, strlen(passwordAndSalt), SHA256Password);
 
 }
 

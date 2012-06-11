@@ -24,11 +24,7 @@ typedef struct img_with_state{
 	int k;
 }img_with_state_t;
 
-typedef struct row{
-	unsigned char * bytes;
-	unsigned char b;
-	int index;
-}row_t;
+
 /**
  * creates a new img_with_state from a iamgine and the k magic number
  */
@@ -255,6 +251,18 @@ calculate_secret_bytes(unsigned char **bytes,unsigned char * bs, unsigned char *
 			x = divide(rows[j].bytes[i],row_pivot.bytes[i] );
 			x_mul_row( x,&row_pivot, k );
 			row_sub_row(&rows[j] , &row_pivot, k);
+			//TODO: Test if a row is all ceros and quit!!
+			int h;
+			int test = 0;
+			for(h = 0 ; h < k; ++h)
+			{
+				test = rows[j].bytes[h] | test;
+			}
+			if(test == 0 )
+			{
+				fprintf(stderr, "we are in trouble, the file generate a indeterminate system, finishing program \n");
+				exit(-1);
+			}
 			if(rows[j].bytes[i] != 0 )
 			{
 				fprintf(stderr, "calculate_secret_bytes: ERROR!!!");
