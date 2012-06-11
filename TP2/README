@@ -1,0 +1,23 @@
+El siguiente archivo contiene información pertinente a la compilación y ejecución de el programa conjuntamente distribuido.
+Compilación:
+Dependencias:
+	Se requiere tener instalado openssl en la computadora y poder utilizar sus funciones y librerias.
+	se requiere del compilador gcc
+	
+Como compilar:
+	cd <DIRECTORIO_RAIZ_DEL_PROGRAMA>
+	make
+	si se desea eliminar todos los objetos y binarios:
+	make clean
+
+Ejecutar:
+	- cd <DIRECTORIO_RAIZ_DEL_PROGRAMA>
+	- ./bin/tp2
+Ejemplos
+	./bin/tp2 -r -k 4 --secret secreto_4.bmp -dir ./misc/catedra/v2/4sombras/
+	donde se desea obtener el secreto que se guardar√° en el archivo secreto_4.bmp utilizando 4 imagenes de ./misc/catedra/v2/4sombras/
+
+Cualquier consulta, por favor comuniquese con los desarrolladores:
+Lucas Pizzagalli
+Nicolás Purita
+Nicolás Bombau	

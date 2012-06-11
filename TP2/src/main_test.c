@@ -24,12 +24,12 @@
 //
 //	simple_8bits_BMP_t * sec;
 //
-//	img1 = load_bmp_from_file("./misc/catedra/v2/4sombras/Angelina4.bmp");
-//	img2 = load_bmp_from_file("./misc/catedra/v2/4sombras/Jim4.bmp");
+//	img1 = load_bmp_from_file("./misc/catedra/v2/2sombras/Gandhi2.bmp");
+//	img2 = load_bmp_from_file("./misc/catedra/v2/2sombras/Grace2.bmp");
 //	img3 = load_bmp_from_file("./misc/catedra/v2/4sombras/Roberto4.bmp");
 //	img4 = load_bmp_from_file("./misc/catedra/v2/4sombras/Whitney4.bmp");
 //
-//	sec = load_bmp_from_file("./misc/catedra/v2/4sombras/Susan4.bmp");
+//	sec = load_bmp_from_file("./misc/catedra/v2/2sombras/Marilyn2.bmp");
 //
 ////	img1 = load_bmp_from_file("./misc/catedra/v2/3sombras/Albert3.bmp");
 ////	img2 = load_bmp_from_file("./misc/catedra/v2/3sombras/Alfred3.bmp");
@@ -43,9 +43,9 @@
 //	shadows[2] = img3;
 //	shadows[3] = img4;
 //
-//	share_secret(2, 4, sec, shadows);
-//	save_bmp_to_file(img1, "./misc/out1.bmp");
-//	save_bmp_to_file(img2, "./misc/out2.bmp");
+////	share_secret(2, 4, sec, shadows);
+////	save_bmp_to_file(img1, "./misc/out1.bmp");
+////	save_bmp_to_file(img2, "./misc/out2.bmp");
 ////	save_bmp_to_file(img3, "./misc/out3.bmp");
 ////	save_bmp_to_file(img4, "./misc/out4.bmp");
 //	get_secret(2, shadows, sec);

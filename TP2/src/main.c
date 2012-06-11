@@ -40,7 +40,7 @@ unsigned int readDirectoryFiles(simple_8bits_BMP_t** secret,
 				simple_8bits_BMP_t** shadowFiles,
 				unsigned int shadows,
 				unsigned int action);
-				
+
 unsigned int validImages(simple_8bits_BMP_t* image,
 			 simple_8bits_BMP_t** shadowFiles,
 			 int readFileAmount);
@@ -186,7 +186,7 @@ IsValid(unsigned int distribute,
                "2 y 8.\n");
         return FALSE;
     }
-    
+
     if(shadows!=0 && min_shadows>shadows)
     {
 	printf("La cantidad minima de sombras necesarias para recuperar el " \
@@ -212,7 +212,7 @@ preprocess(unsigned int action,
     unsigned int shadowsAmount = shadows == 0 ? 8 : shadows;
     simple_8bits_BMP_t** shadowFiles;
     simple_8bits_BMP_t* image = NULL;
-    
+
     shadowFiles = calloc(8+1, sizeof(simple_8bits_BMP_t*));
     if (shadowFiles == NULL)
     {
@@ -251,7 +251,7 @@ preprocess(unsigned int action,
 	if (action == DISTRIBUTE)
 	{
 	    share_secret(min_shadows,readFileAmount,image,shadowFiles);
-	    
+
 	    while(shadowFiles[i]!=NULL)
 	    {
 		char outname[256];
@@ -274,7 +274,7 @@ preprocess(unsigned int action,
     {
 	return FALSE;
     }
-    
+
     return TRUE;
 }
 
@@ -338,7 +338,7 @@ validImages(simple_8bits_BMP_t* image,simple_8bits_BMP_t** shadowFiles,int readF
 {
     int height=0,width=0;
     unsigned int i=1;
-    
+
     if(shadowFiles[0]->dib_header->bitxpixel==8)
     {
 	height=shadowFiles[0]->dib_header->height;
@@ -349,7 +349,7 @@ validImages(simple_8bits_BMP_t* image,simple_8bits_BMP_t** shadowFiles,int readF
 	printf("La imagen no es de 8 bits por pixel.\n");
 	return FALSE;
     }
-    
+
     while(i<readFileAmount)
     {
 	if(shadowFiles[i]->dib_header->bitxpixel==8)
@@ -368,7 +368,7 @@ validImages(simple_8bits_BMP_t* image,simple_8bits_BMP_t** shadowFiles,int readF
 	}
 	++i;
     }
-    
+
     if(image!=NULL)
     {
 	if(image->dib_header->bitxpixel==8)
