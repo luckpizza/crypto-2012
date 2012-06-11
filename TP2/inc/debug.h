@@ -11,13 +11,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 //#define DEBUG1
-#define INFO 1
-#define NO_ERROR 1
-#ifdef DEBUG1
-#define debug(fmt, ...) fprintf(stderr, fmt, ##__VA_ARGS__)
-#else
+//#define INFO 1
+//#define NO_ERROR 1
+//#ifdef DEBUG1
+//#define debug(fmt, ...) fprintf(stderr, fmt, ##__VA_ARGS__)
+//#else
 #define debug(fmt, ...)
-#endif
+//#endif
 
 #ifdef INFO
 #define info(fmt, ...) fprintf(stderr, fmt, ##__VA_ARGS__)

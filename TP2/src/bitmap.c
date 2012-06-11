@@ -51,7 +51,6 @@ load_bmp_from_file( char * file_path)
 	dib_header->extra = my_malloc(still_to_read );
 	memset(dib_header->extra, 0, still_to_read);
 	fread_with_error(dib_header->extra, still_to_read, 1, file);
-//	fseek(file, img->file_offset, SEEK_SET);
 	img->img = my_malloc(dib_header->height * sizeof(char*));
 	memset(img->img, 0, dib_header->height * sizeof(char*));
 	int i;
@@ -67,9 +66,7 @@ load_bmp_from_file( char * file_path)
 		{
 			fseek(file, (((dib_header->bitxpixel/8) * dib_header->width) % 4), SEEK_CUR);
 		}
-		if(i == 37){
-			printf("asd");
-		}
+
 	}
 	img->dib_header = dib_header;
 	fclose(file);
@@ -114,6 +111,6 @@ save_bmp_to_file( simple_8bits_BMP_t* img, char * file_path)
 	}
 	fflush(file);
 	fclose(file);
-	return 1;
+	return OK;
 
 }
