@@ -70,11 +70,14 @@ void modify_one_byte(unsigned char *data, int k)
 		}
 //	}
 }
-
+/*
+ * Triangulates the matrix and returs if it is not scd
+ * return: -1 if everything is ok or the row with a problem
+ *
+ */
 
 int
 triangulate_matrix(row_t * rows, int k){
-//	row_t * rows = my_malloc(k*sizeof(row_t));
 	int rta = -1;
 	int tmp = 0;
 	int i,j,l;
@@ -106,12 +109,6 @@ triangulate_matrix(row_t * rows, int k){
 		unsigned char x = 0;
 		for(j = (i + 1) ; j < k ; ++j)
 		{
-//			if(rows[j].bytes[i] == 0)
-//				continue;
-//			if(rows[j].bytes[i] != 0 )
-//			{
-//				fprintf(stderr, "calculate_secret_bytes: ERROR!!! \n");
-//			}
 			memcpy(row_pivot.bytes, rows[i].bytes, k * sizeof(char));
 			row_pivot.b = rows[i].b;
 			x = divide(rows[j].bytes[i],row_pivot.bytes[i] );
@@ -159,7 +156,10 @@ triangulate_matrix(row_t * rows, int k){
 	my_free(recover_bytes);
 	return rta;
 }
-
+/**
+ *
+ * Makes the matrix linear_independent
+ */
 
 
 int
@@ -244,7 +244,6 @@ make_linear_independent(unsigned char ** data, int k , int n)
 
 						if((idx_modified = triangulate_matrix(rows, k)) != -1)
 						{
-							//			printf("index modified %d \n", idx_modified);
 							modify_one_byte(data[idx_modified], k);
 							status = MODIFIED;
 						}
@@ -300,7 +299,6 @@ make_linear_independent(unsigned char ** data, int k , int n)
 							rows[3].index = m;
 							if((idx_modified = triangulate_matrix(rows, k)) != -1)
 							{
-								//		printf("index modified %d \n", idx_modified);
 								modify_one_byte(data[idx_modified], k);
 								status = MODIFIED;
 							}
@@ -324,10 +322,6 @@ make_linear_independent(unsigned char ** data, int k , int n)
 	my_free(rows);
 	return OK;
 }
-
-
-
-
 
 
 
@@ -383,7 +377,57 @@ are_linear_independent(unsigned char * v1, unsigned char * v2, int amount)
 }
 
 
+void
+swap_rows( row_t * a, row_t * b)
+{
+	row_t tmp;
+	tmp.b = a->b;
+	tmp.bytes = a->bytes;
+	tmp.index = a->index;
+	a->b = b->b;
+	a->bytes = b->bytes;
+	a->index = b->index;
+	b->b = tmp.b;
+	b->bytes = tmp.bytes;
+	b->index = tmp.index;
+}
 
+void
+swap_char( unsigned char *a, unsigned char *b)
+{
+	unsigned char  tmp;
+	tmp = *a;
+	*a = *b;
+	*b = tmp;
+}
+
+void
+x_mul_bytes(unsigned char x, unsigned char * bytes, int k)
+{
+	int i;
+	for ( i = 0; i < k; ++i) {
+		bytes[i] = mul(bytes[i], x);
+	}
+}
+
+void
+x_mul_row(unsigned char x, row_t * row, int k)
+{
+	x_mul_bytes(x, row->bytes, k );
+	row->b = mul(row->b, x);
+
+}
+
+void
+row_sub_row(row_t * a, row_t * b, int k)
+{
+	int i;
+	for ( i = 0; i < k; ++i) {
+		a->bytes[i] = sub(a->bytes[i], b->bytes[i]);
+	}
+	a->b = sub(a->b , b->b);
+
+}
 
 //int
 //main(void)

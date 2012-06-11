@@ -29,3 +29,16 @@ are_linear_independent(unsigned char * v1, unsigned char * v2, int amount);
 
 int
 make_linear_independent(unsigned char ** data, int k , int n);
+void
+swap_rows( row_t * a, row_t * b);
+void
+swap_char( unsigned char *a, unsigned char *b);
+
+void
+x_mul_bytes(unsigned char x, unsigned char * bytes, int k);
+
+void
+x_mul_row(unsigned char x, row_t * row, int k);
+
+void
+row_sub_row(row_t * a, row_t * b, int k);

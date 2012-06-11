@@ -23,10 +23,6 @@ sub(unsigned char a, unsigned char b)
 	rta = a -b;
 	rta = (rta + 251)%251;
 	return rta;
-//	int rta;
-//	int x = a;
-//	rta =  (x - b) % 251;
-//	return rta;
 }
 
 unsigned char

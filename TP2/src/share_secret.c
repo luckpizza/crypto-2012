@@ -38,7 +38,6 @@ new_one_step_in_img(simple_8bits_BMP_t * img,int k)
 		return NULL;
 	}
 
-//	rta->current_bytes = my_malloc(k * sizeof(unsigned char));
 	rta->current_bytes =NULL;
 	rta->i = 0;
 	rta->j = 0;
@@ -136,68 +135,7 @@ one_step_in_imgs(img_with_state_t ** img, int n)
 	return status;
 }
 
-void
-swap_rows( row_t * a, row_t * b)
-{
-	row_t tmp;
-	tmp.b = a->b;
-	tmp.bytes = a->bytes;
-	tmp.index = a->index;
-	a->b = b->b;
-	a->bytes = b->bytes;
-	a->index = b->index;
-	b->b = tmp.b;
-	b->bytes = tmp.bytes;
-	b->index = tmp.index;
-	//
-	//	a = b;
-	//	b = tmp;
-}
-//void
-//swap_bytes(unsigned char ** a, unsigned char ** b)
-//{
-//	unsigned char ** tmp;
-//	tmp = a;
-//	a = b;
-//	b = tmp;
-//}
 
-void
-swap_char( unsigned char *a, unsigned char *b)
-{
-	unsigned char  tmp;
-	tmp = *a;
-	*a = *b;
-	*b = tmp;
-}
-
-void
-x_mul_bytes(unsigned char x, unsigned char * bytes, int k)
-{
-	int i;
-	for ( i = 0; i < k; ++i) {
-		bytes[i] = mul(bytes[i], x);
-	}
-}
-
-void
-x_mul_row(unsigned char x, row_t * row, int k)
-{
-	x_mul_bytes(x, row->bytes, k );
-	row->b = mul(row->b, x);
-
-}
-
-void
-row_sub_row(row_t * a, row_t * b, int k)
-{
-	int i;
-	for ( i = 0; i < k; ++i) {
-		a->bytes[i] = sub(a->bytes[i], b->bytes[i]);
-	}
-	a->b = sub(a->b , b->b);
-
-}
 
 int
 calculate_secret_bytes(unsigned char **bytes,unsigned char * bs, unsigned char * recover_bytes,int k )
@@ -323,7 +261,7 @@ get_secret(int k,simple_8bits_BMP_t ** shadows, simple_8bits_BMP_t * secret )
 		for (j = 0; j < k; ++j) {
 			if(validate_bytes(shads[j]->current_bytes, k) == ERROR)
 			{
-				fprintf(stderr, " \n File is has not a secret! \n exiting \n");
+				fprintf(stderr, " \n File has not a secret! (Or at least ours) \nexiting \n");
 				exit(-1);
 			}
 			bs[j] = get_b_from_pixels(k,shads[j]->current_bytes);
@@ -334,11 +272,6 @@ get_secret(int k,simple_8bits_BMP_t ** shadows, simple_8bits_BMP_t * secret )
 
 		for ( j = 0; j < k; ++j)
 		{
-			//TODO: DELETE!
-				if(recover_bytes[j] == 0)
-				{
-					printf("rec byte is 0");
-				}
 			sec->current_bytes[j] = recover_bytes[j];
 		}
 	}
@@ -381,7 +314,6 @@ share_secret(int k, int n, simple_8bits_BMP_t * secret, simple_8bits_BMP_t ** sh
 			b = calculate_b(bytes[j], sec->current_bytes, k);
 			save_b_to_coefficients(b, k,bytes[j]);
 		}
-		//	cal
 	}
 	my_free(bytes);
 	return OK;
